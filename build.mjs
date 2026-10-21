@@ -86,6 +86,7 @@ for (const t of topics) {
   for (const p of readMarkdownDir(`content/posts/${t.slug}`)) {
     need(p, ['title', 'summary', 'updated']);
     if (p.data.updated && !isIsoDate(p.data.updated)) problem(`${p.file}: "updated" must be a date like 2026-10-21.`);
+    if (p.data.type && !['guide', 'prompt'].includes(p.data.type)) problem(`${p.file}: "type" must be guide or prompt.`);
     if (!visible(p)) continue;
     posts.push({
       slug: p.slug,
@@ -95,7 +96,7 @@ for (const t of topics) {
       updated: p.data.updated,
       source: p.data.source || '',
       tags: Array.isArray(p.data.tags) ? p.data.tags : [],
-      featured: !!p.data.featured,
+      type: p.data.type === 'prompt' ? 'prompt' : 'guide',
       example: !!p.data.example,
       draft: !!p.data.draft,
       _body: p.body,
@@ -259,7 +260,9 @@ for (const t of topics) {
   } else if (t.widget === 'restaurants') {
     t.count = restaurants.length ? `${restaurants.length} place${restaurants.length === 1 ? '' : 's'}` : '';
   } else {
-    t.count = t.posts.length ? `${t.posts.length} guide${t.posts.length === 1 ? '' : 's'}` : '';
+    const g = t.posts.filter((p) => p.type !== 'prompt').length;
+    const pr = t.posts.length - g;
+    t.count = [pr ? `${pr} AI prompt${pr === 1 ? '' : 's'}` : '', g ? `${g} guide${g === 1 ? '' : 's'}` : ''].filter(Boolean).join(', ');
   }
   if (!t.count) t.count = 'Coming soon';
 }

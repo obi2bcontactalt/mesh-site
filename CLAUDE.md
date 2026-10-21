@@ -45,12 +45,12 @@ summary: One sentence saying what this guide answers.
 updated: 2026-10-21
 source: From the Telegram group, checked October 2026
 tags: [iqama, residency]
-featured: false
+type: guide           (guide | prompt)
 ---
 Body in Markdown.
 ```
 - `updated` changes every time the facts change. Readers rely on it.
-- `featured: true` on a study guide with a prompt puts it in the home page "Study tools you can copy" band.
+- `type: prompt` is for AI prompts (with a ` ```prompt ` block). They get their own "AI prompts" section at the top of their topic page, as cards with a Copy button, separate from the guides. Owner's choice: prompts are not featured on the home page.
 - `example: true` or `draft: true` = visible only in the preview build.
 
 **Date** `content/calendar/ramadan-1448.md`

@@ -3,7 +3,7 @@ title: AI mind map maker
 summary: Turns a lecture, a chapter or your notes into a clean mind map you can view, print or revise from.
 updated: 2026-10-21
 tags: [ai, prompts, mind maps]
-featured: true
+type: prompt
 example: true
 ---
 Copy the prompt, paste it into any AI chat (Claude, ChatGPT or Gemini), then paste your notes or a chapter underneath it.

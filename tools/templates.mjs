@@ -228,29 +228,7 @@ export function homePage(ctx) {
       </a>
     </li>`).join('');
 
-  const tools = posts.filter((p) => p.featured && p.topic === 'study');
-  const toolCards = tools.map((p) => {
-    const m = (p._body || '').match(/```prompt[^\n]*\n([\s\S]*?)```/);
-    const prompt = m ? m[1].trim() : '';
-    return `<article class="tool-card">
-      <h3><a href="${link(depth, `${p.topic}/${p.slug}/`)}">${esc(p.title)}</a>${badge(p)}</h3>
-      <p>${esc(p.summary)}</p>
-      ${prompt ? `<pre class="tool-peek" data-copy-source>${esc(prompt)}</pre>
-      <div class="btn-row"><button type="button" class="btn btn-gold btn-small" data-copy>Copy prompt</button><a class="btn btn-ghost btn-small" href="${link(depth, `${p.topic}/${p.slug}/`)}">How to use it</a></div>` : ''}
-    </article>`;
-  }).join('');
-  const toolsBand = tools.length ? `<section class="band band-study" aria-labelledby="tools-h">
-  <div class="band-lattice" aria-hidden="true"></div>
-  <div class="wrap">
-    <div class="band-head">
-      <h2 id="tools-h">Study tools you can copy</h2>
-      <p>Prompts that turn your notes into mind maps and practice exams. Copy one, paste it into any AI chat, then add your notes.</p>
-    </div>
-    <div class="tool-grid">${toolCards}</div>
-  </div>
-</section>` : '';
-
-  const recent = posts.filter((p) => !tools.includes(p)).slice(0, 4);
+  const recent = posts.slice(0, 4);
   const recentSection = recent.length ? `<section class="wrap recent" aria-labelledby="recent-h">
   <h2 id="recent-h" class="section-title">Recently updated</h2>
   ${postList(ctx, depth, recent, { showTopic: true })}
@@ -275,11 +253,25 @@ ${nextUp}
   <h2 id="topics-h" class="section-title">Find it by topic</h2>
   <ul class="topic-list">${rows}</ul>
 </section>
-${toolsBand}
 ${recentSection}
 ${askBand(ctx, depth)}`;
 
   return shell(ctx, { title: site.fullName, description: site.description, depth, key: '', body, bodyClass: 'page-home' });
+}
+
+function promptCards(ctx, depth, list) {
+  const { link } = ctx;
+  return list.map((p) => {
+    const m = (p._body || '').match(/```prompt[^\n]*\n([\s\S]*?)```/);
+    const prompt = m ? m[1].trim() : '';
+    const href = link(depth, `${p.topic}/${p.slug}/`);
+    return `<article class="tool-card">
+      <h3><a href="${href}">${esc(p.title)}</a>${badge(p)}</h3>
+      <p>${esc(p.summary)}</p>
+      ${prompt ? `<pre class="tool-peek" data-copy-source>${esc(prompt)}</pre>
+      <div class="btn-row"><button type="button" class="btn btn-gold btn-small" data-copy>Copy prompt</button><a class="btn btn-ghost btn-small" href="${href}">How to use it</a></div>` : ''}
+    </article>`;
+  }).join('');
 }
 
 // ---------- topic ----------
@@ -291,13 +283,26 @@ export function topicPage(ctx, t) {
   if (t.widget === 'calendar') widget = calendarWidget(ctx, depth);
   if (t.widget === 'restaurants') widget = restaurantWidget(ctx, depth);
 
-  const empty = t.widget ? '' : `<div class="empty">
+  const prompts = t.posts.filter((p) => p.type === 'prompt');
+  const guideList = t.posts.filter((p) => p.type !== 'prompt');
+  const promptSection = prompts.length ? `<section class="band band-study" aria-labelledby="prompts-h">
+  <div class="band-lattice" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="band-head">
+      <h2 id="prompts-h">AI prompts</h2>
+      <p>Copy a prompt, paste it into any AI chat (Claude, ChatGPT or Gemini), then add your notes.</p>
+    </div>
+    <div class="tool-grid">${promptCards(ctx, depth, prompts)}</div>
+  </div>
+</section>` : '';
+  const empty = t.widget || prompts.length ? '' : `<div class="empty">
       <p class="empty-title">No guides here yet.</p>
       <p>Guides for this topic are moving over from the Telegram group. Ask your question now and the answer will be added here.</p>
       <a class="btn btn-gold" href="${link(depth, 'ask/')}?topic=${t.slug}">Ask about ${esc(lowerFirst(t.title))}</a>
     </div>`;
-  const guides = t.posts.length
-    ? `<section class="wrap topic-posts" aria-labelledby="guides-h"><h2 id="guides-h" class="section-title">${t.widget ? 'Guides' : 'All guides'}</h2>${postList(ctx, depth, t.posts)}</section>`
+  const guidesHeading = prompts.length && t.slug === 'study' ? 'Study tips' : (t.widget ? 'Guides' : 'All guides');
+  const guides = guideList.length
+    ? `<section class="wrap topic-posts" aria-labelledby="guides-h"><h2 id="guides-h" class="section-title">${guidesHeading}</h2>${postList(ctx, depth, guideList)}</section>`
     : (empty ? `<section class="wrap topic-posts">${empty}</section>` : '');
 
   const body = `<section class="wrap topic-hero">
@@ -307,6 +312,7 @@ export function topicPage(ctx, t) {
   <div class="topic-intro prose">${t.introHtml}</div>
 </section>
 ${widget}
+${promptSection}
 ${guides}
 ${askBand(ctx, depth, t)}`;
   return shell(ctx, { title: `${t.title} | ${site.name}`, description: t.blurb, depth, key: `${t.slug}/`, body, bodyClass: `page-topic topic-${t.slug}`, current: `${t.slug}/` });

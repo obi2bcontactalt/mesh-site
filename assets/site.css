@@ -537,6 +537,7 @@ p { margin: 0; }
 .topic-intro { max-width: 60ch; font-size: var(--step-1); color: var(--fg-muted); }
 .topic-intro p + p { margin-top: 0.8em; }
 .topic-posts { padding-block: 0 var(--section); }
+.band + .topic-posts { padding-top: var(--section); }
 .page-topic .cal, .page-topic .food { padding-bottom: var(--section); }
 
 .empty {

@@ -3,7 +3,7 @@ title: Exam practice prompt
 summary: Makes the AI quiz you one question at a time on your own material, then tells you what to revise.
 updated: 2026-10-21
 tags: [ai, prompts, exams]
-featured: true
+type: prompt
 example: true
 ---
 Copy the prompt, paste it into any AI chat, then paste the lessons you want to be tested on.
