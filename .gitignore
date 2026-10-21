@@ -1,0 +1,8 @@
+dist/
+dist-preview/
+node_modules/
+.DS_Store
+*.log
+# Telegram exports stay out of the repo
+result.json
+ChatExport*/
