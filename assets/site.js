@@ -370,6 +370,71 @@
     } else fallback();
   });
 
+  // ---------- download a whole set of files as one zip (made in the browser) ----------
+  // Cloudflare can't host one file over 25 MB, so the zip is built on the visitor's device.
+
+  doc.querySelectorAll('[data-zip-all]').forEach(function (btn) {
+    var status = btn.parentNode.querySelector('[data-zip-status]');
+    var idle = status ? status.textContent : '';
+    function say(t) { if (status) status.textContent = t; }
+    function loadZipLib() {
+      if (window.JSZip) return Promise.resolve(window.JSZip);
+      return new Promise(function (resolve, reject) {
+        var s = doc.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+        s.onload = function () { resolve(window.JSZip); };
+        s.onerror = reject;
+        doc.head.appendChild(s);
+      });
+    }
+    btn.addEventListener('click', function () {
+      var links = Array.prototype.slice.call(doc.querySelectorAll('.prose .file-link'));
+      if (!links.length) return;
+      btn.disabled = true;
+      say('Preparing…');
+      loadZipLib().then(function (JSZip) {
+        var zip = new JSZip();
+        var done = 0;
+        var queue = links.slice();
+        function next() {
+          var a = queue.shift();
+          if (!a) return Promise.resolve();
+          var level = (a.closest('[data-level]') || {}).dataset ? a.closest('[data-level]').dataset.level : '';
+          var name = a.getAttribute('download') || a.getAttribute('href').split('/').pop();
+          return fetch(a.href).then(function (r) {
+            if (!r.ok) throw new Error('file');
+            return r.arrayBuffer();
+          }).then(function (buf) {
+            zip.file((level ? level + '/' : '') + name, buf, { binary: true });
+            done++;
+            say('Downloading ' + done + ' of ' + links.length + '…');
+            return next();
+          });
+        }
+        // three files at a time
+        return Promise.all([next(), next(), next()]).then(function () {
+          say('Making the zip…');
+          return zip.generateAsync({ type: 'blob', compression: 'STORE' });
+        });
+      }).then(function (blob) {
+        var url = URL.createObjectURL(blob);
+        var a = doc.createElement('a');
+        a.href = url;
+        a.download = btn.dataset.zipName || 'files.zip';
+        doc.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+        say('Done. Check your downloads.');
+      }).catch(function () {
+        say('The download didn’t finish. Check your connection and try again.');
+      }).then(function () {
+        btn.disabled = false;
+        setTimeout(function () { say(idle); }, 8000);
+      });
+    });
+  });
+
   // ---------- restaurant map ↔ cards ----------
 
   doc.querySelectorAll('.map-pin').forEach(function (pin) {
