@@ -677,7 +677,7 @@ p { margin: 0; }
 .prose .callout-warning { box-shadow: inset 4px 0 0 var(--gold); }
 .prose .callout-important { box-shadow: inset 4px 0 0 var(--accent); }
 .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius-small); }
-.prose table { width: 100%; border-collapse: collapse; font-size: var(--step--1); }
+.prose table { width: 100%; min-width: 34rem; border-collapse: collapse; font-size: var(--step--1); }
 .prose th, .prose td { padding: 0.7em 0.9em; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
 .prose th { background: var(--bg-raised); font-weight: 700; }
 .prose tr:last-child td { border-bottom: 0; }
