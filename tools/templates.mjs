@@ -184,8 +184,8 @@ function foldList(ctx, depth, list) {
     let extra = '';
     let action = `<a class="btn btn-gold btn-small" href="${href}">Read guide</a>`;
     if (p.type === 'prompt') {
-      const m = (p._body || '').match(/```prompt[^\n]*\n([\s\S]*?)```/);
-      const prompt = m ? m[1].trim() : '';
+      const m = (p._body || '').match(/(`{3,})prompt[^\n]*\n([\s\S]*?)\n\1/);
+      const prompt = m ? m[2].trim() : '';
       if (prompt) extra = `<pre class="tool-peek" data-copy-source>${esc(prompt)}</pre>`;
       action = `${prompt ? '<button type="button" class="btn btn-gold btn-small" data-copy>Copy prompt</button>' : ''}<a class="btn btn-ghost btn-small" href="${href}">How to use it</a>`;
     }
@@ -287,8 +287,8 @@ ${askBand(ctx, depth)}`;
 function promptCards(ctx, depth, list) {
   const { link } = ctx;
   return list.map((p) => {
-    const m = (p._body || '').match(/```prompt[^\n]*\n([\s\S]*?)```/);
-    const prompt = m ? m[1].trim() : '';
+    const m = (p._body || '').match(/(`{3,})prompt[^\n]*\n([\s\S]*?)\n\1/);
+    const prompt = m ? m[2].trim() : '';
     const href = link(depth, `${p.topic}/${p.slug}/`);
     return `<article class="tool-card">
       <h3><a href="${href}">${esc(p.title)}</a>${badge(p)}</h3>
@@ -320,7 +320,7 @@ export function topicPage(ctx, t) {
       <p>Guides for this topic are moving over from the Telegram group. Ask your question now and the answer will be added here.</p>
       <a class="btn btn-gold" href="${link(depth, 'ask/')}?topic=${t.slug}">Ask about ${esc(lowerFirst(t.title))}</a>
     </div>`;
-  const guidesHeading = prompts.length && t.slug === 'study' ? 'Study tips' : (t.widget ? 'Guides' : 'All guides');
+  const guidesHeading = t.slug === 'study' ? 'Resources' : (t.widget ? 'Guides' : 'All guides');
   const guides = guideList.length
     ? `<section class="wrap topic-posts" aria-labelledby="guides-h"><h2 id="guides-h" class="section-title">${guidesHeading}</h2>${foldList(ctx, depth, guideList)}</section>`
     : (empty ? `<section class="wrap topic-posts">${empty}</section>` : '');

@@ -97,6 +97,7 @@ for (const t of topics) {
       source: p.data.source || '',
       tags: Array.isArray(p.data.tags) ? p.data.tags : [],
       type: p.data.type === 'prompt' ? 'prompt' : 'guide',
+      order: typeof p.data.order === 'number' ? p.data.order : 999,
       example: !!p.data.example,
       draft: !!p.data.draft,
       _body: p.body,
@@ -114,6 +115,8 @@ if (fs.existsSync(postsRoot)) {
   }
 }
 posts.sort((a, b) => (b.updated || '').localeCompare(a.updated || '') || a.title.localeCompare(b.title));
+// Lists inside a topic follow `order` when a post sets it (e.g. the mind map maker before the exam maker).
+const topicOrder = (list) => [...list].sort((a, b) => a.order - b.order);
 
 // Calendar
 const KINDS = { islamic: 'Islamic', national: 'Saudi', university: 'University', other: 'Other' };
@@ -263,7 +266,7 @@ events.sort((a, b) => (a.open ? a.end : a.date).localeCompare(b.open ? b.end : b
 for (const r of restaurants) r.noteHtml = md(r._body, 1);
 
 for (const t of topics) {
-  t.posts = posts.filter((p) => p.topic === t.slug);
+  t.posts = topicOrder(posts.filter((p) => p.topic === t.slug));
   if (t.widget === 'calendar') {
     const upcoming = events.filter((e) => (e.end || e.date) >= TODAY).length;
     t.count = upcoming ? `${upcoming} upcoming date${upcoming === 1 ? '' : 's'}` : '';

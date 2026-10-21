@@ -46,6 +46,7 @@ updated: 2026-10-21
 source: From the Telegram group, checked October 2026
 tags: [iqama, residency]
 type: guide           (guide | prompt)
+order: 1              (optional: fixes the position in the topic's list)
 ---
 Body in Markdown.
 ```
