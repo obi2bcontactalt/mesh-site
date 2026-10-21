@@ -1108,3 +1108,19 @@ html.theme-switching::view-transition-new(root) { animation: theme-reveal 0.6s v
 .site-footer nav + nav .footer-links { margin-top: 0.35rem; padding-top: 0.35rem; border-top: 1px solid var(--foot-line); }
 @media (min-width: 760px) { .site-footer nav + nav { grid-column: 2; } }
 .footer-word { max-width: 300px; margin-top: 0.9rem; }
+
+/* ---------- course description lists (levels → courses → files) ---------- */
+
+.prose .level-fold { margin-top: 0; }
+.prose .level-fold + .level-fold { margin-top: 0; }
+.prose details.fold summary { list-style: none; }
+.level-ar { font-size: 0.85em; color: var(--gold-ink); margin-left: 0.5em; font-weight: 600; }
+.prose .course-list { list-style: none; padding: 0 0 1.25rem; margin: 0; display: grid; gap: 0.5rem; }
+.prose .course-list li { margin: 0; display: grid; gap: 0.45rem; padding: 0.8rem 0.9rem; border-radius: var(--radius-small); background: var(--bg-raised); }
+.course-name { font-weight: 700; font-size: var(--step-0); text-align: right; }
+.course-files { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.prose .file-link { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 40px; padding: 0.35em 0.9em; border-radius: 999px; background: var(--head-bg); color: var(--head-fg); text-decoration: none; font-size: var(--step--1); font-weight: 700; }
+.prose .file-link:hover { filter: brightness(1.08); }
+.file-meta { font-weight: 500; opacity: 0.75; font-size: 0.85em; }
+.course-files { justify-content: flex-end; }
+.prose .level-fold:first-of-type { border-top: 1.5px solid var(--fg); }

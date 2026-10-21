@@ -4,7 +4,7 @@ summary: The official description of every course, by college and level, so you 
 updated: 2026-10-21
 type: links
 order: 3
-tags: [tawsif, توصيف, توصيف المقررات, course description, course specification, syllabus, curriculum, kulliyah, college, levels, dawah, الدعوة, quran, hadith]
+tags: [tawsif, توصيف, توصيف المقررات, course description, course specification, syllabus, curriculum, kulliyah, college, levels, aqeedah, dawah, العقيدة والدعوة, quran, hadith]
 ---
 Every course at the university has a **توصيف** (course description): the official list of topics it covers (قائمة الموضوعات), its aims and what you're assessed on. Use it to see exactly what's on your syllabus before you study.
 
@@ -12,7 +12,7 @@ Each college has **8 levels**, two per year.
 
 | College | Course descriptions |
 | --- | --- |
-| **Da'wah** (كلية الدعوة) | [Open the folder](https://drive.google.com/drive/folders/1Lh4DaJoKsb1MoEHL9bCOEFygbQ82hAwk) |
+| **Aqeedah and Da'wah** (كلية العقيدة والدعوة) | [Levels 1 to 8](/study/course-descriptions-aqeedah-dawah/) |
 | **Qur'an** (كلية القرآن الكريم) | Coming soon |
 | **Hadith** (كلية الحديث الشريف) | Coming soon |
 
