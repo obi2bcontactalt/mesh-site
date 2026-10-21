@@ -124,10 +124,12 @@ const events = readMarkdownDir('content/calendar').map((e) => {
   const kind = e.data.kind || 'other';
   if (!KINDS[kind]) problem(`${e.file}: "kind" must be one of ${Object.keys(KINDS).join(', ')}.`);
   if (!visible(e)) return null;
+  if ((e.data.end || e.data.date) < TODAY) return null; // passed dates are never shown
   return {
     slug: e.slug,
     title: e.data.title,
     arabic: e.data.arabic || '',
+    term: e.data.term || '',
     date: e.data.date,
     end: e.data.end || '',
     kind,
@@ -249,7 +251,15 @@ for (const e of events) {
   e.day = gregorian(e.date, { day: 'numeric' });
   e.mon = gregorian(e.date, { month: 'short', year: 'numeric' });
   e.wk = gregorian(e.date, { weekday: 'short' });
+  e.open = !!e.end && e.date < TODAY; // a window that has opened but not closed yet
+  if (e.end) {
+    e.endDay = gregorian(e.end, { day: 'numeric' });
+    e.endMon = gregorian(e.end, { month: 'short', year: 'numeric' });
+    e.endWk = gregorian(e.end, { weekday: 'short' });
+  }
 }
+// Show dates in the order they matter: open windows by their closing date, the rest by their start.
+events.sort((a, b) => (a.open ? a.end : a.date).localeCompare(b.open ? b.end : b.date));
 for (const r of restaurants) r.noteHtml = md(r._body, 1);
 
 for (const t of topics) {

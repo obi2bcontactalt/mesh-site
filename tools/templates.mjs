@@ -232,13 +232,13 @@ export function homePage(ctx) {
 
   const upcoming = events.filter((e) => e.date >= TODAY);
   const next = upcoming[0];
-  const eventsJson = JSON.stringify(events.map((e) => ({ slug: e.slug, title: e.title, date: e.date, end: e.end, expected: e.expected, greg: e.greg, hijri: e.hijri })))
+  const eventsJson = JSON.stringify(events.map((e) => ({ slug: e.slug, title: e.title, term: e.term, date: e.date, end: e.end, expected: e.expected, greg: e.greg, hijri: e.hijri })))
     .replace(/</g, '\\u003c');
 
   const nextUp = next ? `<section class="wrap next-up" aria-label="Next on the calendar">
   <a class="next-card" data-next-up href="${link(depth, 'calendar/#' + next.slug)}">
     <span class="next-line"><span data-next-title>${esc(next.title)}</span> <span class="next-when" data-next-when>soon</span></span>
-    <span class="next-meta"><span data-next-meta>${next.expected ? 'Expected ' : ''}${esc(next.greg)}, ${esc(next.hijri)}</span> <span class="next-link">Full calendar ${icon.arrow}</span></span>
+    <span class="next-meta"><span data-next-meta>${next.term ? esc(next.term) + '. ' : ''}${next.expected ? 'Expected ' : ''}${esc(next.greg)}, ${esc(next.hijri)}</span> <span class="next-link">Full calendar ${icon.arrow}</span></span>
   </a>
   <script type="application/json" id="mesh-events">${eventsJson}</script>
 </section>` : '';
@@ -339,15 +339,16 @@ ${askBand(ctx, depth, t)}`;
 }
 
 function calendarWidget(ctx, depth) {
-  const { events, TODAY } = ctx;
-  if (!events.length) return `<section class="wrap"><div class="empty"><p class="empty-title">No dates yet.</p><p>Term dates and holidays will appear here with countdowns.</p></div></section>`;
-  const kinds = [...new Set(events.map((e) => e.kind))];
-  const chips = kinds.length > 1 ? `<div class="chips" role="group" aria-label="Show">
+  const { events } = ctx;
+  if (!events.length) return `<section class="wrap"><div class="empty"><p class="empty-title">No dates yet.</p><p>Dates from the university calendar will appear here with countdowns.</p></div></section>`;
+  const group = (e) => e.term || e.kindLabel;
+  const groups = [...new Set(events.map(group))];
+  const chips = groups.length > 1 ? `<div class="chips" role="group" aria-label="Show">
       <button type="button" class="chip" aria-pressed="true" data-filter="all">All</button>
-      ${kinds.map((k) => `<button type="button" class="chip" aria-pressed="false" data-filter="${k}">${esc(events.find((e) => e.kind === k).kindLabel)}</button>`).join('')}
+      ${groups.map((g) => `<button type="button" class="chip" aria-pressed="false" data-filter="${esc(g)}">${esc(g)}</button>`).join('')}
     </div>` : '';
-  const item = (e) => `<li class="cal-item" id="${e.slug}" data-date="${e.date}" data-end="${e.end}" data-kind="${e.kind}">
-      <div class="cal-when" aria-hidden="true"><span class="cal-day">${esc(e.day)}</span><span class="cal-mon">${esc(e.mon)}</span><span class="cal-wk">${esc(e.wk)}</span></div>
+  const item = (e) => `<li class="cal-item" id="${e.slug}" data-date="${e.date}" data-end="${e.end}" data-group="${esc(group(e))}">
+      <div class="cal-when" aria-hidden="true">${e.open ? '<span class="cal-until">Until</span>' : ''}<span class="cal-day">${esc(e.open ? e.endDay : e.day)}</span><span class="cal-mon">${esc(e.open ? e.endMon : e.mon)}</span><span class="cal-wk">${esc(e.open ? e.endWk : e.wk)}</span></div>
       <div class="cal-what">
         <h3>${esc(e.title)}${badge(e)}</h3>
         ${ar(e.arabic, 'cal-ar')}
@@ -355,12 +356,11 @@ function calendarWidget(ctx, depth) {
         ${e.expected ? '<p class="cal-note">Expected date. Confirmed by moon sighting.</p>' : ''}
         ${e.noteHtml ? `<div class="cal-body prose">${e.noteHtml}</div>` : ''}
       </div>
-      <p class="cal-count"><span class="kind kind-${e.kind}">${esc(e.kindLabel)}</span><span data-countdown>${(e.end || e.date) < TODAY ? 'Passed' : ''}</span></p>
+      <p class="cal-count"><span class="kind">${esc(group(e))}</span><span data-countdown></span></p>
     </li>`;
   return `<section class="wrap cal" data-calendar aria-label="Dates">
   ${chips}
-  <ol class="cal-list" data-cal-upcoming>${events.filter((e) => (e.end || e.date) >= TODAY).map(item).join('')}</ol>
-  <details class="cal-past" data-cal-past-wrap><summary>Past dates</summary><ol class="cal-list" data-cal-past>${events.filter((e) => (e.end || e.date) < TODAY).map(item).join('')}</ol></details>
+  <ol class="cal-list">${events.map(item).join('')}</ol>
 </section>`;
 }
 

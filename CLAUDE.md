@@ -53,19 +53,21 @@ Body in Markdown.
 - `type: prompt` is for AI prompts (with a ` ```prompt ` block). On a topic page the guides come first, then an "AI prompts" section. Both are collapsible lists: titles only, tap to see the description and the Read guide / Copy prompt buttons. Owner wants the sections to flow together, not as contrasting blocks. Owner's choice: prompts are not featured on the home page.
 - `example: true` or `draft: true` = visible only in the preview build.
 
-**Date** `content/calendar/ramadan-1448.md`
+**Date** `content/calendar/1448-2-finals.md`
 ```
 ---
-title: Ramadan begins
-arabic: بداية شهر رمضان
-date: 2027-02-08
-end: 2027-02-10        (optional, for ranges)
-kind: islamic          (islamic | national | university | other)
-expected: true         (Islamic dates that depend on moon sighting)
+title: "Start of final exams"
+arabic: بداية الاختبارات النهائية
+term: Second semester     (First semester | Second semester | Summer semester)
+date: 2027-04-25
+end: 2027-05-01           (optional, for ranges)
+kind: university
 ---
-Optional note.
+Optional note, only if the university calendar has one.
 ```
-Compute Islamic dates with the Umm al-Qura calendar (`Intl` with `islamic-umalqura` in Node), never by guessing. Hijri labels are generated automatically.
+- **The calendar shows the university's academic calendar only.** No Islamic or national dates that aren't on it. Titles are faithful translations of the university's own wording, with the Arabic original in `arabic`.
+- **Passed dates are removed.** The build skips them and the page hides any that pass between builds; delete their files when you're next in the calendar folder. When a new academic calendar is published, replace the files with the new one.
+- Hijri labels are generated automatically (Umm al-Qura) and match the university's calendar.
 
 **Restaurant** `content/restaurants/al-tazaj-quba.md`
 ```

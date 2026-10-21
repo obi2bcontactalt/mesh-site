@@ -1,6 +1,7 @@
 ---
-title: Second semester final exams begin
+title: "Start of final exams"
 arabic: بداية الاختبارات النهائية
-date: 2027-04-25
+term: Summer semester
+date: 2027-07-27
 kind: university
 ---

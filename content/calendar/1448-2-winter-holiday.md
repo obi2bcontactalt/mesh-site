@@ -1,6 +1,7 @@
 ---
-title: Winter holiday
+title: "Winter holiday"
 arabic: إجازة الشتاء
+term: Second semester
 date: 2027-01-08
 end: 2027-01-16
 kind: university

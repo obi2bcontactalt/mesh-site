@@ -51,7 +51,11 @@
   function countdownText(start, end, today) {
     var last = end || start;
     if (today > last) return 'Passed';
-    if (today >= start) return end ? 'Happening now' : 'Today';
+    if (today >= start) {
+      if (!end) return 'Today';
+      var left = daysUntil(end, today);
+      return left === 0 ? 'Ends today' : left === 1 ? 'Ends tomorrow' : 'Ends in ' + left + ' days';
+    }
     var d = daysUntil(start, today);
     if (d === 1) return 'Tomorrow';
     return 'In ' + d + ' days';
@@ -76,38 +80,30 @@
       } else {
         var when = countdownText(next.date, next.end, TODAY);
         nextCard.querySelector('[data-next-title]').textContent = next.title;
-        nextCard.querySelector('[data-next-when]').textContent = when === 'Today' || when === 'Happening now' ? when.toLowerCase() : when.toLowerCase();
-        nextCard.querySelector('[data-next-meta]').textContent = (next.expected ? 'Expected ' : '') + next.greg + ', ' + next.hijri;
+        nextCard.querySelector('[data-next-when]').textContent = when.toLowerCase();
+        nextCard.querySelector('[data-next-meta]').textContent = (next.term ? next.term + '. ' : '') + (next.expected ? 'Expected ' : '') + next.greg + ', ' + next.hijri;
         nextCard.setAttribute('href', pageUrl('calendar/#' + next.slug));
       }
     } catch (e) { /* keep the built version */ }
   }
 
-  // Calendar page: countdowns, moving past dates down, and filters.
+  // Calendar page: countdowns, removing dates that have passed since the build, and filters.
   var cal = doc.querySelector('[data-calendar]');
   if (cal) {
-    var upcomingList = cal.querySelector('[data-cal-upcoming]');
-    var pastList = cal.querySelector('[data-cal-past]');
-    var pastWrap = cal.querySelector('[data-cal-past-wrap]');
-    var items = Array.prototype.slice.call(cal.querySelectorAll('.cal-item'));
-    items.sort(function (a, b) { return a.dataset.date < b.dataset.date ? -1 : 1; });
-    items.forEach(function (li) {
+    var items = Array.prototype.slice.call(cal.querySelectorAll('.cal-item')).filter(function (li) {
       var text = countdownText(li.dataset.date, li.dataset.end, TODAY);
+      if (text === 'Passed') { li.remove(); return false; }
       var slot = li.querySelector('[data-countdown]');
       if (slot) slot.textContent = text;
-      li.classList.toggle('is-now', text === 'Today' || text === 'Happening now');
-      if (text === 'Passed') pastList.appendChild(li);
-      else upcomingList.appendChild(li);
+      li.classList.toggle('is-now', text === 'Today' || text.indexOf('Ends') === 0);
+      return true;
     });
-    var pastItems = pastList.querySelectorAll('.cal-item');
-    Array.prototype.slice.call(pastItems).reverse().forEach(function (li) { pastList.appendChild(li); });
-    pastWrap.hidden = pastItems.length === 0;
-
     cal.querySelectorAll('[data-filter]').forEach(function (chip) {
+      var f = chip.dataset.filter;
+      if (f !== 'all' && !items.some(function (li) { return li.dataset.group === f; })) chip.remove();
       chip.addEventListener('click', function () {
-        var f = chip.dataset.filter;
         cal.querySelectorAll('[data-filter]').forEach(function (c) { c.setAttribute('aria-pressed', String(c === chip)); });
-        items.forEach(function (li) { li.hidden = !(f === 'all' || li.dataset.kind === f); });
+        items.forEach(function (li) { li.hidden = !(f === 'all' || li.dataset.group === f); });
       });
     });
   }
