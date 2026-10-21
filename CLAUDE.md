@@ -122,7 +122,19 @@ The look comes from the MESH logo. Keep it.
 4. Push to `main`. Cloudflare deploys in about a minute.
 5. Tell the owner what changed, with the page address.
 
+## How the owner sends content
+
+The owner sends items **one at a time** (a screenshot, a message, a file, a photo, a link). For each one:
+
+1. Work out what it is and where it belongs (which topic, which guide, or a calendar date / restaurant).
+2. If a guide on that subject exists, update it. Otherwise create one. Many small items can build up one guide over time.
+3. **Duplicates:** if the new item covers the same thing as existing content and is newer, replace the old information without asking. Keep the existing file and address (so shared links keep working), rewrite it with the new facts, and update `updated`. If two existing guides cover the same thing, merge them into the newer one's facts and delete the other file. Decide "newer" from the dates shown (message dates, document dates); if it isn't clear which is newer, ask.
+4. Build, check, push, and reply briefly: what was added or changed, where it went (with the page link), and anything that was replaced or removed.
+5. Ask only when something is genuinely unclear: which version is current, a missing location, or content that might not be shareable.
+
 ## Moving the Telegram group over
+
+Usually the owner sends screenshots one by one (see above); the export below is the alternative when a computer is available.
 
 1. The owner exports the group from **Telegram Desktop** (chat menu → Export chat history → format **JSON**, media optional) and uploads `result.json`.
 2. `python3 -I tools/telegram_digest.py result.json /tmp/digest` (keep exports out of the repo).
