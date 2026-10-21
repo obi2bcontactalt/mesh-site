@@ -8,6 +8,8 @@ tags: [ai, prompt, mind map, xmind, markdown, gemini, gem, claude, project, revi
 ---
 This isn't a one-off prompt. It's a set of **instructions** for a Claude Project or a Gemini Gem, so the AI follows the same rules every time. It works on both, in slightly different ways (below). It hasn't been tested on ChatGPT.
 
+<figure class="showcase showcase-map"><a href="/assets/img/study/mind-map-example.jpg" target="_blank" rel="noopener"><img src="/assets/img/study/mind-map-example.jpg" width="1070" height="1499" alt="A mind map in Xmind made with this prompt: the book's title in the centre, its eight chapters as coloured branches, and one chapter opened into its sections, definitions and sub-points." loading="lazy"></a><figcaption><b>What you get:</b> a whole book as one map in Xmind. Chapters branch out from the title, and each opens into its sections, definitions and conditions. Tap to see it full size.</figcaption></figure>
+
 ````prompt Mind map maker (paste into the instructions)
 <role>
 

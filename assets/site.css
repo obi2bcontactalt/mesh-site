@@ -1128,3 +1128,14 @@ html.theme-switching::view-transition-new(root) { animation: theme-reveal 0.6s v
 .prose .zip-all { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1rem; padding: 1rem; border-radius: var(--radius); background: var(--bg-raised); }
 .zip-status { color: var(--fg-muted); font-size: var(--step--1); font-weight: 600; }
 .btn:disabled { opacity: 0.6; cursor: progress; }
+
+/* ---------- "What you get" screenshots ---------- */
+
+.prose .showcase { margin: 1.75em 0 0; display: grid; gap: 0.75rem; }
+.showcase a { display: block; border-radius: var(--radius); overflow: hidden; background: #fff; box-shadow: 0 1px 0 var(--line), 0 18px 40px -24px var(--shadow); border: 1px solid var(--line); }
+.showcase img { display: block; width: 100%; height: auto; border-radius: 0; }
+.showcase-map a { max-width: 34rem; }
+.showcase-pair .shots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; max-width: 34rem; }
+.showcase-pair .shots a { border-radius: 22px; border: 6px solid var(--fg); }
+.showcase figcaption { font-size: var(--step--1); color: var(--fg-muted); max-width: 52ch; line-height: 1.55; }
+.showcase figcaption b { color: var(--fg); }
