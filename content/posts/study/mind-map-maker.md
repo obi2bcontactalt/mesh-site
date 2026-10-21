@@ -1,12 +1,12 @@
 ---
 title: Mind map maker (for Xmind)
-summary: Instructions that make an AI read your whole book, split it into chunks, and turn each chunk into a clean Markdown mind map you can open in Xmind.
+summary: Instructions that make an AI read your whole book and turn it into a Markdown mind map for Xmind, in full, medium and small versions for revision.
 updated: 2026-10-21
 type: prompt
 order: 1
 tags: [ai, prompt, mind map, xmind, markdown, gemini, gem, claude, project, revision, book, chunkism, خريطة ذهنية]
 ---
-This isn't a one-off prompt. It's a set of **instructions** for a Gemini Gem or a Claude Project, so the AI follows the same rules every time you ask for a chunk.
+This isn't a one-off prompt. It's a set of **instructions** for a Claude Project or a Gemini Gem, so the AI follows the same rules every time. It works on both, in slightly different ways (below). It hasn't been tested on ChatGPT.
 
 ````prompt Mind map maker (paste into the instructions)
 <role>
@@ -168,15 +168,35 @@ MODE 6 (Default): Process provided text as Markdown.
 ## How to use it
 
 > [!IMPORTANT]
-> The key step: upload the book, have the AI read **the entire book** first, then **update the instructions** with the chunk schedule it gives you. Only then make the mind map.
+> Always start the same way: upload the book, have the AI read **the entire book** with `Chunkism`, then **update the instructions** with the chunk schedule it gives you. Only then make the mind map.
 
-1. **Create a Gem (Gemini) or a Project (Claude)** and paste the prompt above into its instructions.
-2. **Upload the book** (PDF) to it.
-3. **Type `Chunkism`.** The AI reads the whole book and replies with a schedule: every chapter split into chunks of 5 to 12 pages, each with a start and end landmark.
-4. **Update the instructions.** Copy that schedule and paste it between `<permanent_schedule>` and `</permanent_schedule>` in the instructions, then save. From now on the AI knows exactly where every chunk starts and ends.
-5. **Type `Chunk 1`.** It confirms what it's looking for (the *System Lock* line), then gives you that chunk as a Markdown block. Then `Chunk 2`, `Chunk 3` and so on.
+### Setting up (both)
+
+1. **Create a Project (Claude) or a Gem (Gemini)** and paste the prompt above into its instructions.
+2. **Upload the book** (PDF).
+3. **Type `Chunkism`.** The AI reads the whole book and replies with a schedule: every chapter split into chunks, each with a start and end landmark.
+4. **Update the instructions.** Copy the schedule, paste it between `<permanent_schedule>` and `</permanent_schedule>`, and save.
+
+### On Claude: the whole mind map in one go
+
+5. Ask for **the entire mind map in one reply**, following the schedule from Chunk 1 to the last chunk, as one Markdown file.
+6. Import the file into **Xmind** (File → Import → Markdown). Headings become branches.
+
+### On Gemini: chunk by chunk
+
+5. **Type `Chunk 1`.** It confirms what it's looking for (the *System Lock* line), then gives you that chunk as a Markdown block. Then `Chunk 2`, `Chunk 3` and so on, one per message.
 6. **If a chunk gets cut off**, type `Continue`. It picks up from the last line.
-7. **Put it together.** Copy each block into one text file and save it as `.md`, then import it into **Xmind** (File → Import → Markdown). Headings become branches.
+7. **Paste each chunk into Xmind** as you go, so the map grows chunk by chunk.
+
+## Three sizes for revision
+
+Once you have the full map, use it as the base for two shorter ones:
+
+- **Full:** everything, for learning the material the first time
+- **Medium:** for revising in the weeks before the exam
+- **Small:** for the last look before you walk in
+
+Ask, for example: *"Using the full mind map as the base, make a medium version and a small version. Scale each one down proportionally, so every chapter keeps its share, and keep the same headings and order."* Import each into Xmind as its own map.
 
 ## Other commands
 
@@ -189,9 +209,8 @@ MODE 6 (Default): Process provided text as Markdown.
 ## Tips and tricks
 
 - **Read the System Lock line.** If the start or end landmark it's searching for is wrong, stop and correct it before it maps the wrong pages.
-- **One chunk per message.** Asking for several at once is when it starts skipping and shortening.
-- **Definitions stay whole.** The instructions forbid cutting definitions short, so if one looks clipped, ask it to redo that chunk.
+- **Definitions stay whole.** The instructions forbid cutting definitions short, so if one looks clipped, ask it to redo that part.
 - **Evidence is left out on purpose.** Verses and hadiths only appear when they're a heading in the book. The map is for the rules and concepts.
-- **Start a new chat every few chunks** if answers get slow or sloppy. The instructions and schedule stay saved, so just type the next chunk number.
+- **On Gemini, start a new chat every few chunks** if answers get slow or sloppy. The instructions and schedule stay saved, so just type the next chunk number.
 - **Keep the .md files.** The exam maker can use them to build practice exams from the same book.
 - **Always check against the book.** AI can get names, numbers and rulings wrong.

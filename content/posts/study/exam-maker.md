@@ -1,12 +1,12 @@
 ---
 title: Exam maker
-summary: Turns your book or mind maps into a practice exam page you can take on your phone, matched to your teacher's exam, with scores and explanations.
+summary: Turns your book or mind maps into a practice exam page you can take on your phone, covering what your teacher said will be in the exam, with scores and explanations.
 updated: 2026-10-21
 type: prompt
 order: 2
 tags: [ai, prompt, exam, test, practice exam, quiz, true false, multiple choice, claude, artifact, revision, امتحان, اختبار]
 ---
-Use this in **Claude**, because it builds the exam as a page with its own link that you can take on your phone and share with classmates.
+Use this in **Claude**. It builds the exam as a page with its own link that you can take on your phone and share with classmates. It hasn't been tested on Gemini or ChatGPT.
 
 ````prompt Exam maker
 Build me an online practice exam as a single published HTML page (artifact).
@@ -56,21 +56,20 @@ Before publishing, check the question counts, the spread of correct letters, and
 ## How to use it
 
 > [!IMPORTANT]
-> Use it in the **same project** as your book (and your mind maps), then **update the instructions to match your teacher and his exam**: which chapters, what's included and excluded, and the question types he uses.
+> Use it in the **same project** as your book (and your mind maps), then **update the instructions with what your teacher said will be in the exam**: which chapters, what's included and excluded, and the types of questions.
 
 1. **Open the same Claude Project** where you uploaded the book. If you made mind maps with the [mind map maker](/study/mind-map-maker/), upload the `.md` files too.
-2. **Fill in the brackets** to match the real exam:
-   - **Cover:** e.g. *from chapter 3 to chapter 7, including chapter 7*
-   - **Exclude:** e.g. *the section on X, the introduction*
-   - **Questions:** the types and numbers your teacher uses: multiple choice, true/false, written questions, matching. The prompt starts with 40 true/false and 40 multiple choice; change them. For written questions, add a line such as *"Add 5 short written questions with a model answer shown after submitting."*
+2. **Fill in the brackets with what your teacher asked for**:
+   - **Cover:** the chapters he said, e.g. *from chapter 3 to chapter 7, including chapter 7*
+   - **Exclude:** anything he left out, e.g. *the section on X, the introduction*
+   - **Questions:** the types he said the exam will have: multiple choice, true/false, written questions, matching. The prompt starts with 40 true/false and 40 multiple choice; change them to match. For written questions, add a line such as *"Add 5 short written questions with a model answer shown after submitting."*
    - **Language:** Arabic or English
-3. **Save it in the project instructions** once it matches your teacher, so every exam you make for that subject follows his style. Just change the chapters next time.
+3. **Save it in the project instructions**, so every practice exam you make for that subject matches what he asked for. Before the next exam, just change the chapters and question types.
 4. **Send it.** Claude builds the exam and gives you a link.
 5. **Share it** with classmates: open the Share menu and set it to *anyone with the link*.
 
 ## Tips and tricks
 
-- **Describe the teacher.** Add what you know: *"He likes questions on definitions and the differences between views"*, *"Most of his true/false statements are almost right"*, *"He always asks for lists of conditions."* The closer it is to his style, the more useful the practice.
 - **Take it like the real exam.** Answers only show after you submit. Then use **show mistakes only** to revise just what you got wrong.
 - **Ask for a fresh exam** on the same scope once you're scoring well, so you're not just memorising the answers.
 - **Narrow it down** before the exam: *"Make a new exam only from the sections I got wrong."*
