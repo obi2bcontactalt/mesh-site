@@ -230,7 +230,7 @@ export function homePage(ctx) {
   const depth = 0;
   const letters = ['M', 'E', 'S', 'H'].map((l, i) => `<span class="wm-l" style="--i:${i}"><span>${l}</span></span>`).join('');
 
-  const upcoming = events.filter((e) => (e.end || e.date) >= TODAY);
+  const upcoming = events.filter((e) => e.date >= TODAY);
   const next = upcoming[0];
   const eventsJson = JSON.stringify(events.map((e) => ({ slug: e.slug, title: e.title, date: e.date, end: e.end, expected: e.expected, greg: e.greg, hijri: e.hijri })))
     .replace(/</g, '\\u003c');

@@ -70,7 +70,7 @@
   if (nextCard && eventsData) {
     try {
       var all = JSON.parse(eventsData.textContent);
-      var next = all.filter(function (e) { return (e.end || e.date) >= TODAY; })[0];
+      var next = all.filter(function (e) { return e.date >= TODAY; })[0];
       if (!next) {
         nextCard.closest('.next-up').hidden = true;
       } else {
