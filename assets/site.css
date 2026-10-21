@@ -908,3 +908,25 @@ html.theme-switching::view-transition-new(root) { animation: theme-reveal 0.6s v
     .fold[open]::details-content { block-size: auto; }
   }
 }
+
+/* ---------- living lattice: a soft gold light drifts slowly along the logo pattern ---------- */
+
+.lattice-glow { display: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .lattice-glow {
+    display: block;
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle 240px at 50% 50%, color-mix(in srgb, var(--gold) var(--glow-strength), transparent), transparent 72%) 0 0 / 200% 200% no-repeat;
+    animation: glow-drift 26s ease-in-out infinite alternate;
+  }
+}
+:root { --glow-strength: 55%; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --glow-strength: 50%; } }
+:root[data-theme="dark"] { --glow-strength: 50%; }
+@keyframes glow-drift {
+  0%   { background-position: 95% 85%; }
+  30%  { background-position: 20% 95%; }
+  60%  { background-position: 5% 20%; }
+  100% { background-position: 75% 5%; }
+}

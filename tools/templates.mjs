@@ -260,7 +260,7 @@ export function homePage(ctx) {
 </section>` : '';
 
   const body = `<section class="hero">
-  <div class="hero-lattice" aria-hidden="true"></div>
+  <div class="hero-lattice" aria-hidden="true"><span class="lattice-glow"></span></div>
   <div class="wrap hero-inner">
     <p class="salam ar" lang="ar" dir="rtl">السلام عليكم ورحمة الله وبركاته</p>
     <h1 class="wordmark"><span class="sr-only">MESH, Medina English Student Hub</span><span class="wm-letters" aria-hidden="true">${letters}</span></h1>
