@@ -106,7 +106,7 @@ The look comes from the MESH logo. Keep it.
 
 - **Tokens live only in the `:root` block of `assets/site.css`.** Components use tokens, never literal colours. Every change works in light (sand) and dark (logo green) themes.
 - **Colours:** logo green `#0F5A3B`, deep green `#0A4129`, logo gold `#E6B141`, sand `#F1EBDD`, ink `#0C3B27`. Gold is for highlights and the main button. On sand, gold text uses `--gold-ink`.
-- **Type:** Archivo only. Display text uses the wide width (`font-stretch: var(--wide)`) at 800–900 weight, like the logo. Body uses normal width. Arabic uses Reem Kufi through the `.ar` class. No other fonts.
+- **Type:** Archivo for English, at its normal width (the owner found the wide cut too stretched; `--wide` is `normal`). Display text is 800–900 weight; body is 400. Arabic uses IBM Plex Sans Arabic (weight 500) through the `.ar` class, chosen for legibility; the owner found the decorative Kufi hard to read. No other fonts.
 - **The lattice** (the pattern from the logo) appears only in the hero, the green bands and the map. Nowhere else.
 - **One bold thing per page:** the giant MESH on the home page, the topic name on topic pages. Everything around it stays quiet.
 - **Motion** is limited to what exists: the home entrance, the wordmark drifting on scroll, the footer letters rising, topic rows sweeping on hover, page transitions, the theme reveal. Don't add fade-ins to sections. Everything respects reduced motion.

@@ -36,8 +36,8 @@
   /* type */
   --font-display: "Archivo", "Arial Black", "Inter Display", system-ui, sans-serif;
   --font-body: "Archivo", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-arabic: "Reem Kufi", "Noto Kufi Arabic", "Geeza Pro", "DejaVu Sans", sans-serif;
-  --wide: 125%;            /* Archivo width axis: the logo is set wide */
+  --font-arabic: "IBM Plex Sans Arabic", "Noto Sans Arabic", "Geeza Pro", "Segoe UI", "DejaVu Sans", sans-serif;
+  --wide: normal;          /* Archivo at its normal width (the wide 125% cut read as too stretched) */
   --step--1: 0.875rem;
   --step-0: 1.0625rem;
   --step-1: 1.25rem;
@@ -135,7 +135,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 h1, h2, h3, h4 { text-wrap: balance; margin: 0; line-height: 1.1; }
 p { margin: 0; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-.ar { font-family: var(--font-arabic); font-stretch: normal; letter-spacing: 0; }
+.ar { font-family: var(--font-arabic); font-stretch: normal; font-weight: 500; letter-spacing: 0; line-height: 1.5; }
 .skip { position: absolute; left: var(--gutter); top: -100px; z-index: 100; background: var(--gold); color: var(--on-gold); padding: 0.6em 1em; border-radius: var(--radius-small); font-weight: 700; }
 .skip:focus { top: calc(env(safe-area-inset-top, 0px) + 8px); }
 
@@ -189,7 +189,7 @@ p { margin: 0; }
   border-radius: 999px;
   border: 1.5px solid transparent;
   font-weight: 700;
-  font-stretch: 108%;
+  font-stretch: normal;
   font-size: var(--step-0);
   line-height: 1.1;
   text-decoration: none;
@@ -521,7 +521,7 @@ p { margin: 0; }
   transition: background-color 0.25s;
 }
 .post-row:hover { background: color-mix(in srgb, var(--fg) 5%, transparent); }
-.pr-title { font-weight: 700; font-stretch: 108%; font-size: var(--step-1); line-height: 1.3; }
+.pr-title { font-weight: 700; font-stretch: normal; font-size: var(--step-1); line-height: 1.3; }
 .post-row:hover .pr-title { text-decoration: underline; text-decoration-color: var(--gold); text-decoration-thickness: 2px; text-underline-offset: 0.18em; }
 .pr-summary { color: var(--fg-muted); max-width: 70ch; }
 .pr-meta { font-size: var(--step--1); color: var(--fg-muted); }
@@ -583,7 +583,7 @@ p { margin: 0; }
 .cal-mon { font-weight: 600; font-size: var(--step--1); margin-top: 0.25rem; }
 .cal-wk { font-size: var(--step--1); color: var(--fg-muted); }
 .cal-what { grid-area: what; display: grid; gap: 0.25rem; min-width: 0; }
-.cal-what h3 { font-size: var(--step-1); font-weight: 700; font-stretch: 108%; line-height: 1.25; }
+.cal-what h3 { font-size: var(--step-1); font-weight: 700; font-stretch: normal; line-height: 1.25; }
 .cal-ar { color: var(--gold-ink); justify-self: start; }
 .cal-dates { color: var(--fg-muted); }
 .cal-note { font-size: var(--step--1); color: var(--fg-muted); }
@@ -630,7 +630,7 @@ p { margin: 0; }
 }
 .food-card:target, .food-card.is-active { border-color: var(--gold); box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 45%, transparent); }
 .fc-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.25rem 1rem; }
-.fc-head h3 { font-size: var(--step-1); font-weight: 700; font-stretch: 108%; }
+.fc-head h3 { font-size: var(--step-1); font-weight: 700; font-stretch: normal; }
 .fc-ar { color: var(--gold-ink); }
 .fc-meta { color: var(--fg-muted); font-size: var(--step--1); font-weight: 600; }
 .fc-note { font-size: var(--step-0); }
@@ -653,7 +653,7 @@ p { margin: 0; }
 .prose > * + * { margin-top: 1.05em; }
 .prose p, .prose li, .prose blockquote, .prose h2, .prose h3, .prose h4 { unicode-bidi: plaintext; }
 .prose h2 { font-family: var(--font-display); font-stretch: var(--wide); font-weight: 800; font-size: var(--step-2); letter-spacing: -0.01em; margin-top: 2.2em; }
-.prose h3 { font-size: var(--step-1); font-weight: 700; font-stretch: 108%; margin-top: 1.8em; }
+.prose h3 { font-size: var(--step-1); font-weight: 700; font-stretch: normal; margin-top: 1.8em; }
 .prose h4 { font-size: var(--step-0); font-weight: 700; margin-top: 1.5em; }
 .prose a { color: var(--fg); text-decoration-color: var(--gold); text-decoration-thickness: 2px; text-underline-offset: 0.18em; }
 .prose a:hover { text-decoration-thickness: 3px; }

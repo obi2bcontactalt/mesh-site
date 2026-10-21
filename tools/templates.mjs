@@ -9,7 +9,7 @@ export const esc = (s = '') => String(s)
 
 const ar = (text, cls = '') => text ? `<span class="ar ${cls}" lang="ar" dir="rtl">${esc(text)}</span>` : '';
 
-const FONTS = 'https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Reem+Kufi:wght@400..700&display=swap';
+const FONTS = 'https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap';
 
 // ---------- icons (inline SVG, 24px grid, stroke = currentColor) ----------
 
