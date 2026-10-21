@@ -176,6 +176,31 @@ function postList(ctx, depth, list, { showTopic = false } = {}) {
     </a></li>`).join('')}</ul>`;
 }
 
+// Titles first; tap a title to see the description and the button to open it.
+function foldList(ctx, depth, list) {
+  const { link } = ctx;
+  return `<ul class="fold-list">${list.map((p) => {
+    const href = link(depth, `${p.topic}/${p.slug}/`);
+    let extra = '';
+    let action = `<a class="btn btn-gold btn-small" href="${href}">Read guide</a>`;
+    if (p.type === 'prompt') {
+      const m = (p._body || '').match(/```prompt[^\n]*\n([\s\S]*?)```/);
+      const prompt = m ? m[1].trim() : '';
+      if (prompt) extra = `<pre class="tool-peek" data-copy-source>${esc(prompt)}</pre>`;
+      action = `${prompt ? '<button type="button" class="btn btn-gold btn-small" data-copy>Copy prompt</button>' : ''}<a class="btn btn-ghost btn-small" href="${href}">How to use it</a>`;
+    }
+    return `<li><details class="fold">
+      <summary><span class="fold-title">${esc(p.title)}${badge(p)}</span><span class="fold-icon" aria-hidden="true"></span></summary>
+      <div class="fold-body">
+        <p class="pr-summary">${esc(p.summary)}</p>
+        ${extra}
+        <div class="btn-row">${action}</div>
+        <p class="pr-meta">Updated ${esc(fmtDate(p.updated))}</p>
+      </div>
+    </details></li>`;
+  }).join('')}</ul>`;
+}
+
 function fmtDate(iso) {
   return new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date(iso + 'T00:00:00Z'));
 }
@@ -288,7 +313,7 @@ export function topicPage(ctx, t) {
   const promptSection = prompts.length ? `<section class="wrap topic-prompts" aria-labelledby="prompts-h">
   <h2 id="prompts-h" class="section-title">AI prompts</h2>
   <p class="section-note">Copy a prompt, paste it into any AI chat (Claude, ChatGPT or Gemini), then add your notes.</p>
-  <div class="tool-grid">${promptCards(ctx, depth, prompts)}</div>
+  ${foldList(ctx, depth, prompts)}
 </section>` : '';
   const empty = t.widget || prompts.length ? '' : `<div class="empty">
       <p class="empty-title">No guides here yet.</p>
@@ -297,7 +322,7 @@ export function topicPage(ctx, t) {
     </div>`;
   const guidesHeading = prompts.length && t.slug === 'study' ? 'Study tips' : (t.widget ? 'Guides' : 'All guides');
   const guides = guideList.length
-    ? `<section class="wrap topic-posts" aria-labelledby="guides-h"><h2 id="guides-h" class="section-title">${guidesHeading}</h2>${postList(ctx, depth, guideList)}</section>`
+    ? `<section class="wrap topic-posts" aria-labelledby="guides-h"><h2 id="guides-h" class="section-title">${guidesHeading}</h2>${foldList(ctx, depth, guideList)}</section>`
     : (empty ? `<section class="wrap topic-posts">${empty}</section>` : '');
 
   const body = `<section class="wrap topic-hero">
@@ -307,8 +332,8 @@ export function topicPage(ctx, t) {
   <div class="topic-intro prose">${t.introHtml}</div>
 </section>
 ${widget}
-${promptSection}
 ${guides}
+${promptSection}
 ${askBand(ctx, depth, t)}`;
   return shell(ctx, { title: `${t.title} | ${site.name}`, description: t.blurb, depth, key: `${t.slug}/`, body, bodyClass: `page-topic topic-${t.slug}`, current: `${t.slug}/` });
 }

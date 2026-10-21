@@ -332,7 +332,7 @@
   doc.addEventListener('click', function (e) {
     var btn = e.target.closest('[data-copy]');
     if (!btn) return;
-    var box = btn.closest('.prompt, .code-block, .tool-card');
+    var box = btn.closest('.prompt, .code-block, .tool-card, .fold-body');
     var source = box && (box.querySelector('[data-copy-source]') || box.querySelector('pre code') || box.querySelector('pre'));
     if (!source) return;
     var text = source.textContent;

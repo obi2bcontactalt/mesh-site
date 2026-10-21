@@ -538,7 +538,8 @@ p { margin: 0; }
 .topic-intro p + p { margin-top: 0.8em; }
 .topic-posts { padding-block: 0 var(--section); }
 .band + .topic-posts { padding-top: var(--section); }
-.topic-prompts { padding-block: 0 clamp(2.5rem, 2rem + 2vw, 3.5rem); }
+.topic-prompts { padding-block: 0 var(--section); }
+.topic-posts + .topic-prompts { margin-top: calc(var(--section) * -0.5); }
 .section-note { color: var(--fg-muted); max-width: 56ch; margin: -0.5rem 0 1.25rem; }
 .topic-prompts .tool-card { background: var(--bg-raised); border-color: var(--line); color: var(--fg); }
 .topic-prompts .tool-peek { color: var(--fg-muted); }
@@ -873,4 +874,37 @@ html.theme-switching::view-transition-new(root) { animation: theme-reveal 0.6s v
 @media (prefers-reduced-motion: reduce) {
   @view-transition { navigation: none; }
   *, *::before, *::after { transition: none !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+}
+
+/* ---------- collapsible lists (titles first) ---------- */
+
+.fold-list { list-style: none; margin: 0; padding: 0; border-top: 1.5px solid var(--fg); }
+.fold { border-bottom: 1px solid var(--line); }
+.fold summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 56px;
+  padding: 0.9rem 0.25rem;
+  cursor: pointer;
+  list-style: none;
+}
+.fold summary::-webkit-details-marker { display: none; }
+.fold summary:hover .fold-title { text-decoration: underline; text-decoration-color: var(--gold); text-decoration-thickness: 2px; text-underline-offset: 0.18em; }
+.fold-title { font-weight: 700; font-size: var(--step-1); line-height: 1.3; }
+.fold-icon { position: relative; flex: none; width: 32px; height: 32px; border: 1.5px solid var(--line); border-radius: 999px; transition: transform 0.35s var(--ease), border-color 0.2s; }
+.fold-icon::before, .fold-icon::after { content: ""; position: absolute; left: 50%; top: 50%; width: 12px; height: 2px; margin: -1px 0 0 -6px; background: currentColor; border-radius: 2px; }
+.fold-icon::after { transform: rotate(90deg); transition: transform 0.35s var(--ease); }
+.fold[open] .fold-icon { border-color: var(--fg); }
+.fold[open] .fold-icon::after { transform: rotate(0deg); }
+.fold-body { display: grid; gap: 0.9rem; padding: 0 0.25rem 1.4rem; max-width: 46rem; }
+.fold-body .pr-summary { color: var(--fg-muted); }
+.fold-body .tool-peek { color: var(--fg-muted); padding: 0.9rem 1rem; border-radius: var(--radius-small); background: var(--bg-raised); }
+@supports selector(::details-content) {
+  @media (prefers-reduced-motion: no-preference) {
+    .fold { interpolate-size: allow-keywords; }
+    .fold::details-content { block-size: 0; overflow: clip; transition: block-size 0.4s var(--ease), content-visibility 0.4s allow-discrete; }
+    .fold[open]::details-content { block-size: auto; }
+  }
 }
