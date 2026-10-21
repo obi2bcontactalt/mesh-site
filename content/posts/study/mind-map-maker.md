@@ -202,7 +202,7 @@ Ask, for example: *"Using the full mind map as the base, make a medium version a
 
 | Type | What it does |
 | --- | --- |
-| `توصيف` | Finds the book's table of contents (قائمة الموضوعات) and reports what the course covers, so you can check nothing is missing |
+| `توصيف` | Upload your course's توصيف (course description, from [Course descriptions](/study/course-descriptions/)) and type this. It reads the list of topics (قائمة الموضوعات) and reports what the course requires, so you can check the map covers your syllabus |
 | `?` followed by your question | A direct answer about the book |
 | Paste any text | Turns that text straight into a mind map |
 

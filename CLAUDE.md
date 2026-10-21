@@ -45,7 +45,7 @@ summary: One sentence saying what this guide answers.
 updated: 2026-10-21
 source: From the Telegram group, checked October 2026
 tags: [iqama, residency]
-type: guide           (guide | prompt)
+type: guide           (guide | prompt | links)
 order: 1              (optional: fixes the position in the topic's list)
 ---
 Body in Markdown.
@@ -111,6 +111,8 @@ The look comes from the MESH logo. Keep it.
 - **Colours:** logo green `#0F5A3B`, deep green `#0A4129`, logo gold `#E6B141`, sand `#F1EBDD`, ink `#0C3B27`. Gold is for highlights and the main button. On sand, gold text uses `--gold-ink`.
 - **Type:** Archivo for English, at its normal width (the owner found the wide cut too stretched; `--wide` is `normal`). Display text is 800–900 weight; body is 400. Arabic uses IBM Plex Sans Arabic (weight 500) through the `.ar` class, chosen for legibility; the owner found the decorative Kufi hard to read. No other fonts.
 - **The lattice** (the pattern from the logo) appears only in the hero, the green bands and the map. Nowhere else.
+- **Page structure (owner approved):** topic pages open with a green header band (gold Arabic, white title, one-line blurb as the intro, jump buttons when there's more than one section, gold edge). Section headings and the `##` headings inside guides sit on a solid colour bar (green, gold in dark mode), and what belongs to them is offset with a thin left line. Lists show title, a two-line summary and a type tag (Prompt, Links; plain guides have none), and open on tap. Topic bodies are not shown; the blurb is the intro.
+- **Page bottom:** a compact "Still have a question" strip with the lattice and drifting light, then a compact deep-green footer. Keep both short.
 - **One bold thing per page:** the giant MESH on the home page, the topic name on topic pages. Everything around it stays quiet.
 - **Motion** is limited to what exists (owner approved all of it): the home entrance, the wordmark drifting on scroll, the footer letters rising, topic rows sweeping on hover, page transitions, the theme reveal, plus small ambient touches: a gold light drifting along the lattice in the hero and green bands, a glint on the gold rule, the rotating search hint, a light passing over the next-date card with a breathing countdown, arrows nudging in on the topic list, rippling map pins and turning landmark diamonds. Don't add fade-ins to sections. Everything switches off with reduced motion.
 - No emoji in the interface. Icons come only from the set in `tools/templates.mjs`.
