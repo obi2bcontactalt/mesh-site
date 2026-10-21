@@ -216,14 +216,15 @@ function fmtDate(iso) {
 function askBand(ctx, depth, topic) {
   const { link } = ctx;
   const q = topic ? `?topic=${topic.slug}` : '';
-  return `<section class="band band-ask">
-  <div class="band-lattice" aria-hidden="true"><span class="lattice-glow"></span></div>
-  <div class="wrap ask-inner">
-    <h2>${topic ? `Still have a question about ${esc(lowerFirst(topic.title))}?` : 'Can’t find what you need?'}</h2>
-    <p>Ask a question or share something you learned. It goes straight to the students who run MESH, and useful answers get added here.</p>
+  return `<section class="ask-strip" aria-label="Ask MESH">
+  <div class="wrap ask-strip-inner">
+    <div class="ask-strip-text">
+      <p class="ask-strip-title">${topic ? `Still have a question about ${esc(lowerFirst(topic.title))}?` : 'Can’t find what you need?'}</p>
+      <p>Ask, or share something you learned. Useful answers get added to the site.</p>
+    </div>
     <div class="btn-row">
-      <a class="btn btn-gold" href="${link(depth, 'ask/')}${q}">Ask MESH</a>
-      <a class="btn btn-ghost" href="${link(depth, 'ask/')}${q ? q + '&' : '?'}type=tip">Share a tip</a>
+      <a class="btn btn-gold btn-small" href="${link(depth, 'ask/')}${q}">Ask MESH</a>
+      <a class="btn btn-ghost btn-small" href="${link(depth, 'ask/')}${q ? q + '&' : '?'}type=tip">Share a tip</a>
     </div>
   </div>
 </section>`;
@@ -342,14 +343,17 @@ export function topicPage(ctx, t) {
       <a class="btn btn-gold" href="${link(depth, 'ask/')}?topic=${t.slug}">Ask about ${esc(lowerFirst(t.title))}</a>
     </div></section>`;
 
-  const body = `<section class="wrap topic-hero">
-  <a class="crumb" href="${link(depth, '')}#topics-h">${icon.back}All topics</a>
-  <div class="topic-head">
-    ${ar(t.arabic, 'topic-ar')}
-    <h1 class="topic-title" style="view-transition-name: t-${t.slug}">${esc(t.title)}</h1>
-    <p class="topic-lede">${esc(t.blurb)}</p>
+  const body = `<section class="topic-hero">
+  <div class="band-lattice" aria-hidden="true"></div>
+  <div class="wrap topic-hero-inner">
+    <a class="crumb" href="${link(depth, '')}#topics-h">${icon.back}All topics</a>
+    <div class="topic-head">
+      ${ar(t.arabic, 'topic-ar')}
+      <h1 class="topic-title" style="view-transition-name: t-${t.slug}">${esc(t.title)}</h1>
+      <p class="topic-lede">${esc(t.blurb)}</p>
+    </div>
+    ${jump}
   </div>
-  ${jump}
 </section>
 ${sectionHtml}
 ${empty}
