@@ -109,7 +109,7 @@ The look comes from the MESH logo. Keep it.
 - **Type:** Archivo for English, at its normal width (the owner found the wide cut too stretched; `--wide` is `normal`). Display text is 800–900 weight; body is 400. Arabic uses IBM Plex Sans Arabic (weight 500) through the `.ar` class, chosen for legibility; the owner found the decorative Kufi hard to read. No other fonts.
 - **The lattice** (the pattern from the logo) appears only in the hero, the green bands and the map. Nowhere else.
 - **One bold thing per page:** the giant MESH on the home page, the topic name on topic pages. Everything around it stays quiet.
-- **Motion** is limited to what exists: the home entrance, the wordmark drifting on scroll, the footer letters rising, topic rows sweeping on hover, page transitions, the theme reveal. Don't add fade-ins to sections. Everything respects reduced motion.
+- **Motion** is limited to what exists (owner approved all of it): the home entrance, the wordmark drifting on scroll, the footer letters rising, topic rows sweeping on hover, page transitions, the theme reveal, plus small ambient touches: a gold light drifting along the lattice in the hero and green bands, a glint on the gold rule, the rotating search hint, a light passing over the next-date card with a breathing countdown, arrows nudging in on the topic list, rippling map pins and turning landmark diamonds. Don't add fade-ins to sections. Everything switches off with reduced motion.
 - No emoji in the interface. Icons come only from the set in `tools/templates.mjs`.
 - Button words stay the same everywhere: "Ask MESH", "Share a tip", "Copy prompt", "Directions", "Send to MESH".
 - Must work at 360px wide with no sideways scrolling, with a keyboard, and in both themes.
