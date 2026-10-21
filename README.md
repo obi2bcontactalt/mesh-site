@@ -31,4 +31,4 @@ node build.mjs --preview       # with example content → dist-preview/
 node tools/serve.mjs dist      # view at http://localhost:4321
 ```
 
-Cloudflare Pages settings: build command `node build.mjs`, output directory `dist`.
+Live at https://mesh.obi2b-contact-alt.workers.dev, deployed by Cloudflare Workers from `main`: build command `node build.mjs`, deploy command `npx wrangler deploy` (settings in `wrangler.jsonc`).

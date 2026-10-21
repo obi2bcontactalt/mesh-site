@@ -1,0 +1,11 @@
+// Cloudflare Workers settings for the live site (mesh.obi2b-contact-alt.workers.dev).
+// "name" must stay "mesh" to match the Worker in the Cloudflare dashboard.
+{
+  "name": "mesh",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist/",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  }
+}

@@ -2,10 +2,20 @@
   "name": "MESH",
   "fullName": "Medina English Student Hub",
   "description": "Answers for English-speaking students in Madinah, from admission to graduation, sorted by topic.",
-  "url": "https://meshmadinah.pages.dev",
+  "url": "https://mesh.obi2b-contact-alt.workers.dev",
   "formAccessKey": "",
   "landmarks": [
-    { "name": "Masjid an-Nabawi", "short": "the Haram", "lat": 24.4672, "lng": 39.6112 },
-    { "name": "Islamic University", "short": "the University", "lat": 24.4808, "lng": 39.5576 }
+    {
+      "name": "Masjid an-Nabawi",
+      "short": "the Haram",
+      "lat": 24.4672,
+      "lng": 39.6112
+    },
+    {
+      "name": "Islamic University",
+      "short": "the University",
+      "lat": 24.4808,
+      "lng": 39.5576
+    }
   ]
 }

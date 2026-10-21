@@ -7,7 +7,7 @@ Read this before changing anything. It keeps the site consistent no matter which
 - **MESH = Medina English Student Hub.** A resource hub for English-speaking students in Madinah, especially at the Islamic University, and their families.
 - It replaces the Telegram group t.me/IslamicUniversityInfo, because most students here don't use Telegram.
 - Run by a few student volunteers. **Not an official university site.** The footer says so; keep it.
-- The owner asks for changes in the claude.ai Project "Website Maker And Maintenance". Claude edits this repo, builds, checks, and pushes to `main`. Cloudflare Pages rebuilds the live site automatically.
+- The owner asks for changes in the claude.ai Project "Website Maker And Maintenance". Claude edits this repo, builds, checks, and pushes to `main`. Cloudflare (a Worker named `mesh`) rebuilds the live site automatically: https://mesh.obi2b-contact-alt.workers.dev
 
 ## How the site is built
 
@@ -18,6 +18,7 @@ Read this before changing anything. It keeps the site consistent no matter which
 
 ```
 site.json              name, description, live URL, Web3Forms key, map landmarks
+wrangler.jsonc         Cloudflare settings: serve dist/, use 404.html. Keep "name": "mesh"
 build.mjs              loads + checks content, renders pages, writes search index/sitemap
 tools/templates.mjs    every page's HTML (header, footer, home, topic, post, ask, about, 404)
 tools/lib/             front matter parser, Hijri/Gregorian dates
