@@ -238,6 +238,15 @@ function md(src, depth) {
 }
 
 const ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'", nbsp: ' ' };
+// Guides: each ## heading gets a coloured bar, and what follows it sits in an offset block.
+function sectionise(html) {
+  const parts = html.split(/(?=<h2 )/);
+  return parts.map((part) => {
+    const m = part.match(/^(<h2 [^>]*>[\s\S]*?<\/h2>)\s*([\s\S]*)$/);
+    return m ? `${m[1]}\n<div class="sec-body">${m[2]}</div>\n` : part;
+  }).join('');
+}
+
 const plain = (html) => html.replace(/<[^>]+>/g, ' ')
   .replace(/&(amp|lt|gt|quot|#39|nbsp);/g, (_, e) => ENTITIES[e]).replace(/&[a-z#0-9]+;/gi, ' ')
   .replace(/\s+/g, ' ').trim();
@@ -315,7 +324,7 @@ page('', T.homePage(ctx));
 for (const t of topics) {
   page(`${t.slug}/`, T.topicPage(ctx, t));
   for (const p of t.posts) {
-    p.html = md(p._body, 2);
+    p.html = sectionise(md(p._body, 2));
     page(`${t.slug}/${p.slug}/`, T.postPage(ctx, t, p));
   }
 }

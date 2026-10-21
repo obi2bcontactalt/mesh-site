@@ -217,6 +217,7 @@ function askBand(ctx, depth, topic) {
   const { link } = ctx;
   const q = topic ? `?topic=${topic.slug}` : '';
   return `<section class="ask-strip" aria-label="Ask MESH">
+  <div class="band-lattice" aria-hidden="true"><span class="lattice-glow"></span></div>
   <div class="wrap ask-strip-inner">
     <div class="ask-strip-text">
       <p class="ask-strip-title">${topic ? `Still have a question about ${esc(lowerFirst(topic.title))}?` : 'Can’t find what you need?'}</p>
