@@ -209,7 +209,7 @@ function askBand(ctx, depth, topic) {
   const { link } = ctx;
   const q = topic ? `?topic=${topic.slug}` : '';
   return `<section class="band band-ask">
-  <div class="band-lattice" aria-hidden="true"></div>
+  <div class="band-lattice" aria-hidden="true"><span class="lattice-glow"></span></div>
   <div class="wrap ask-inner">
     <h2>${topic ? `Still have a question about ${esc(lowerFirst(topic.title))}?` : 'Can’t find what you need?'}</h2>
     <p>Ask a question or share something you learned. It goes straight to the students who run MESH, and useful answers get added here.</p>
@@ -268,7 +268,7 @@ export function homePage(ctx) {
     <p class="acronym" aria-hidden="true"><span><b>M</b>edina</span><i>·</i><span><b>E</b>nglish</span><i>·</i><span><b>S</b>tudent</span><i>·</i><span><b>H</b>ub</span></p>
     <div class="hero-foot">
       <p class="hero-lede">${esc(site.description)}</p>
-      <button type="button" class="search-trigger" data-open-search>${icon.search}<span>Search visas, exams, food…</span><kbd>/</kbd></button>
+      <button type="button" class="search-trigger" data-open-search>${icon.search}<span data-hint-cycle>Search visas, exams, food…</span><kbd>/</kbd></button>
       <p class="today" data-hijri-today>Today is ${esc(hijriText(TODAY))}, ${esc(new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(TODAY + 'T00:00:00Z')))}.</p>
     </div>
   </div>

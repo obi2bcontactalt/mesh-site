@@ -137,6 +137,23 @@
     }, 120);
   });
 
+  // ---------- home: the search hint cycles through example searches ----------
+
+  var hint = doc.querySelector('[data-hint-cycle]');
+  if (hint && !reduceMotion) {
+    var hints = [hint.textContent, 'Try “Ramadan”', 'Try “exams”', 'Try “Eid”', 'Try “restaurants”', 'Try “رمضان”'];
+    var h = 0;
+    setInterval(function () {
+      if (doc.hidden) return;
+      hint.classList.add('is-swapping');
+      setTimeout(function () {
+        h = (h + 1) % hints.length;
+        hint.textContent = hints[h];
+        hint.classList.remove('is-swapping');
+      }, 350);
+    }, 3200);
+  }
+
   // ---------- theme ----------
 
   function activeTheme() {
