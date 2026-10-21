@@ -3,6 +3,7 @@ title: Arabic learning resources
 summary: Free books, answers and materials for the Madinah Arabic course and the Arabic Language Institute.
 updated: 2026-10-21
 source: From the MESH Telegram group
+type: links
 tags: [arabic, madinah arabic, madinah books, durus al-lughah, arabic language institute, mahad, books, answers, pdf, عربي, دروس اللغة العربية]
 ---
 - **[All levels, with answers](https://qalam.mediu.edu.my/2016/05/20):** materials for every level, with answer keys

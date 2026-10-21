@@ -86,7 +86,7 @@ for (const t of topics) {
   for (const p of readMarkdownDir(`content/posts/${t.slug}`)) {
     need(p, ['title', 'summary', 'updated']);
     if (p.data.updated && !isIsoDate(p.data.updated)) problem(`${p.file}: "updated" must be a date like 2026-10-21.`);
-    if (p.data.type && !['guide', 'prompt'].includes(p.data.type)) problem(`${p.file}: "type" must be guide or prompt.`);
+    if (p.data.type && !['guide', 'prompt', 'links'].includes(p.data.type)) problem(`${p.file}: "type" must be guide, prompt or links.`);
     if (!visible(p)) continue;
     posts.push({
       slug: p.slug,
@@ -96,7 +96,7 @@ for (const t of topics) {
       updated: p.data.updated,
       source: p.data.source || '',
       tags: Array.isArray(p.data.tags) ? p.data.tags : [],
-      type: p.data.type === 'prompt' ? 'prompt' : 'guide',
+      type: ['prompt', 'links'].includes(p.data.type) ? p.data.type : 'guide',
       order: typeof p.data.order === 'number' ? p.data.order : 999,
       example: !!p.data.example,
       draft: !!p.data.draft,

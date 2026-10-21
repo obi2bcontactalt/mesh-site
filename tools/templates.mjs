@@ -177,12 +177,15 @@ function postList(ctx, depth, list, { showTopic = false } = {}) {
 }
 
 // Titles first; tap a title to see the description and the button to open it.
+const TYPE_LABEL = { prompt: 'Prompt', guide: 'Guide', links: 'Links' };
+
+// Titles first, with a type tag and a one-line summary; tap to see the rest.
 function foldList(ctx, depth, list) {
   const { link } = ctx;
   return `<ul class="fold-list">${list.map((p) => {
     const href = link(depth, `${p.topic}/${p.slug}/`);
     let extra = '';
-    let action = `<a class="btn btn-gold btn-small" href="${href}">Read guide</a>`;
+    let action = `<a class="btn btn-gold btn-small" href="${href}">${p.type === 'links' ? 'Open the links' : 'Read guide'}</a>`;
     if (p.type === 'prompt') {
       const m = (p._body || '').match(/(`{3,})prompt[^\n]*\n([\s\S]*?)\n\1/);
       const prompt = m ? m[2].trim() : '';
@@ -190,9 +193,14 @@ function foldList(ctx, depth, list) {
       action = `${prompt ? '<button type="button" class="btn btn-gold btn-small" data-copy>Copy prompt</button>' : ''}<a class="btn btn-ghost btn-small" href="${href}">How to use it</a>`;
     }
     return `<li><details class="fold">
-      <summary><span class="fold-title">${esc(p.title)}${badge(p)}</span><span class="fold-icon" aria-hidden="true"></span></summary>
+      <summary>
+        <span class="fold-main">
+          <span class="fold-title">${esc(p.title)}${badge(p)}</span>
+          <span class="fold-sub">${esc(p.summary)}</span>
+        </span>
+        <span class="fold-side">${p.type !== 'guide' ? `<span class="fold-type type-${p.type}">${TYPE_LABEL[p.type]}</span>` : ''}<span class="fold-icon" aria-hidden="true"></span></span>
+      </summary>
       <div class="fold-body">
-        <p class="pr-summary">${esc(p.summary)}</p>
         ${extra}
         <div class="btn-row">${action}</div>
         <p class="pr-meta">Updated ${esc(fmtDate(p.updated))}</p>
@@ -301,39 +309,50 @@ function promptCards(ctx, depth, list) {
 
 // ---------- topic ----------
 
-export function topicPage(ctx, t) {
-  const { link, site } = ctx;
-  const depth = 1;
-  let widget = '';
-  if (t.widget === 'calendar') widget = calendarWidget(ctx, depth);
-  if (t.widget === 'restaurants') widget = restaurantWidget(ctx, depth);
+// A section with a clear heading: gold mark, name, and how many items it holds.
+function sectionHead(id, label, count, note = '') {
+  return `<div class="sec-head"><h2 id="${id}-h">${esc(label)}</h2>${count ? `<span class="sec-count">${count}</span>` : ''}</div>${note ? `<p class="sec-note">${note}</p>` : ''}`;
+}
 
+export function topicPage(ctx, t) {
+  const { link, site, events, restaurants } = ctx;
+  const depth = 1;
   const prompts = t.posts.filter((p) => p.type === 'prompt');
   const guideList = t.posts.filter((p) => p.type !== 'prompt');
-  const promptSection = prompts.length ? `<section class="wrap topic-prompts" aria-labelledby="prompts-h">
-  <h2 id="prompts-h" class="section-title">AI prompts</h2>
-  <p class="section-note">Copy a prompt, paste it into any AI chat (Claude, ChatGPT or Gemini), then add your notes.</p>
-  ${foldList(ctx, depth, prompts)}
-</section>` : '';
-  const empty = t.widget || prompts.length ? '' : `<div class="empty">
+
+  // Sections in order of importance: the topic's own tool (dates, map), then prompts, then guides.
+  const sections = [];
+  if (t.widget === 'calendar') sections.push({ id: 'dates', label: 'Dates', count: events.length, html: calendarWidget(ctx, depth) });
+  if (t.widget === 'restaurants') sections.push({ id: 'map', label: 'Map', count: restaurants.length, html: restaurantWidget(ctx, depth) });
+  if (prompts.length) sections.push({ id: 'prompts', label: 'AI prompts', count: prompts.length, note: 'Tap a prompt to open it and copy it. <b>How to use it</b> has the steps.', html: foldList(ctx, depth, prompts) });
+  if (guideList.length) sections.push({ id: 'guides', label: t.slug === 'study' ? 'Resources' : 'Guides', count: guideList.length, html: foldList(ctx, depth, guideList) });
+
+  const many = sections.length > 1;
+  const jump = many ? `<nav class="jump" aria-label="On this page">${sections.map((x) => `<a class="chip" href="#${x.id}">${esc(x.label)}<span class="chip-n">${x.count || ''}</span></a>`).join('')}</nav>` : '';
+  const sectionHtml = sections.map((x) => {
+    const isWidget = x.id === 'dates' || x.id === 'map';
+    if (isWidget && !many) return x.html; // a page that's only a tool needs no heading
+    if (isWidget) return `<section class="sec" id="${x.id}" aria-labelledby="${x.id}-h"><div class="wrap">${sectionHead(x.id, x.label, x.count)}</div>${x.html}</section>`;
+    return `<section class="sec wrap" id="${x.id}" aria-labelledby="${x.id}-h">${sectionHead(x.id, x.label, x.count, x.note)}${x.html}</section>`;
+  }).join('\n');
+
+  const empty = sections.length ? '' : `<section class="sec wrap"><div class="empty">
       <p class="empty-title">No guides here yet.</p>
       <p>Guides for this topic are moving over from the Telegram group. Ask your question now and the answer will be added here.</p>
       <a class="btn btn-gold" href="${link(depth, 'ask/')}?topic=${t.slug}">Ask about ${esc(lowerFirst(t.title))}</a>
-    </div>`;
-  const guidesHeading = t.slug === 'study' ? 'Resources' : (t.widget ? 'Guides' : 'All guides');
-  const guides = guideList.length
-    ? `<section class="wrap topic-posts" aria-labelledby="guides-h"><h2 id="guides-h" class="section-title">${guidesHeading}</h2>${foldList(ctx, depth, guideList)}</section>`
-    : (empty ? `<section class="wrap topic-posts">${empty}</section>` : '');
+    </div></section>`;
 
   const body = `<section class="wrap topic-hero">
   <a class="crumb" href="${link(depth, '')}#topics-h">${icon.back}All topics</a>
-  ${ar(t.arabic, 'topic-ar')}
-  <h1 class="topic-title" style="view-transition-name: t-${t.slug}">${esc(t.title)}</h1>
-  <div class="topic-intro prose">${t.introHtml}</div>
+  <div class="topic-head">
+    ${ar(t.arabic, 'topic-ar')}
+    <h1 class="topic-title" style="view-transition-name: t-${t.slug}">${esc(t.title)}</h1>
+    <p class="topic-lede">${esc(t.blurb)}</p>
+  </div>
+  ${jump}
 </section>
-${widget}
-${guides}
-${promptSection}
+${sectionHtml}
+${empty}
 ${askBand(ctx, depth, t)}`;
   return shell(ctx, { title: `${t.title} | ${site.name}`, description: t.blurb, depth, key: `${t.slug}/`, body, bodyClass: `page-topic topic-${t.slug}`, current: `${t.slug}/` });
 }
