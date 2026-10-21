@@ -50,7 +50,7 @@ type: guide           (guide | prompt)
 Body in Markdown.
 ```
 - `updated` changes every time the facts change. Readers rely on it.
-- `type: prompt` is for AI prompts (with a ` ```prompt ` block). They get their own "AI prompts" section at the top of their topic page, as cards with a Copy button, separate from the guides. Owner's choice: prompts are not featured on the home page.
+- `type: prompt` is for AI prompts (with a ` ```prompt ` block). They get their own "AI prompts" section at the top of their topic page: quiet cards with a Copy button on the page background, followed by the guides. Owner wants the two sections to flow together, not as contrasting blocks. Owner's choice: prompts are not featured on the home page.
 - `example: true` or `draft: true` = visible only in the preview build.
 
 **Date** `content/calendar/ramadan-1448.md`

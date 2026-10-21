@@ -538,6 +538,10 @@ p { margin: 0; }
 .topic-intro p + p { margin-top: 0.8em; }
 .topic-posts { padding-block: 0 var(--section); }
 .band + .topic-posts { padding-top: var(--section); }
+.topic-prompts { padding-block: 0 clamp(2.5rem, 2rem + 2vw, 3.5rem); }
+.section-note { color: var(--fg-muted); max-width: 56ch; margin: -0.5rem 0 1.25rem; }
+.topic-prompts .tool-card { background: var(--bg-raised); border-color: var(--line); color: var(--fg); }
+.topic-prompts .tool-peek { color: var(--fg-muted); }
 .page-topic .cal, .page-topic .food { padding-bottom: var(--section); }
 
 .empty {

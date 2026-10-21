@@ -285,15 +285,10 @@ export function topicPage(ctx, t) {
 
   const prompts = t.posts.filter((p) => p.type === 'prompt');
   const guideList = t.posts.filter((p) => p.type !== 'prompt');
-  const promptSection = prompts.length ? `<section class="band band-study" aria-labelledby="prompts-h">
-  <div class="band-lattice" aria-hidden="true"></div>
-  <div class="wrap">
-    <div class="band-head">
-      <h2 id="prompts-h">AI prompts</h2>
-      <p>Copy a prompt, paste it into any AI chat (Claude, ChatGPT or Gemini), then add your notes.</p>
-    </div>
-    <div class="tool-grid">${promptCards(ctx, depth, prompts)}</div>
-  </div>
+  const promptSection = prompts.length ? `<section class="wrap topic-prompts" aria-labelledby="prompts-h">
+  <h2 id="prompts-h" class="section-title">AI prompts</h2>
+  <p class="section-note">Copy a prompt, paste it into any AI chat (Claude, ChatGPT or Gemini), then add your notes.</p>
+  <div class="tool-grid">${promptCards(ctx, depth, prompts)}</div>
 </section>` : '';
   const empty = t.widget || prompts.length ? '' : `<div class="empty">
       <p class="empty-title">No guides here yet.</p>
