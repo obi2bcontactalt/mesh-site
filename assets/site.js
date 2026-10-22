@@ -232,6 +232,158 @@
     window.addEventListener('load', function () { navigator.serviceWorker.register(ROOT + 'sw.js').catch(function () {}); });
   }
 
+  // ---------- "I am a…": put the topics that matter to this reader first ----------
+
+  var rolePick = doc.querySelector('[data-roles]');
+  if (rolePick) {
+    var roles = [];
+    try { roles = JSON.parse(rolePick.dataset.roles); } catch (e) { roles = []; }
+    var topicList = doc.querySelector('.topic-list');
+    var originalOrder = Array.prototype.slice.call(topicList.children);
+    var startLine = rolePick.querySelector('[data-role-start]');
+    function applyRole(id) {
+      var role = roles.filter(function (r) { return r.id === id; })[0];
+      rolePick.querySelectorAll('[data-role]').forEach(function (c) { c.setAttribute('aria-pressed', String(!!role && c.dataset.role === id)); });
+      originalOrder.forEach(function (li) {
+        li.classList.remove('is-for-you');
+        var tag = li.querySelector('.for-you');
+        if (tag) tag.remove();
+      });
+      var order = originalOrder.slice();
+      if (role) {
+        var first = role.topics.map(function (slug) { return originalOrder.filter(function (li) { return li.dataset.topic === slug; })[0]; }).filter(Boolean);
+        order = first.concat(originalOrder.filter(function (li) { return first.indexOf(li) < 0; }));
+        first.forEach(function (li) {
+          li.classList.add('is-for-you');
+          var tag = doc.createElement('span');
+          tag.className = 'for-you';
+          tag.textContent = 'For you';
+          li.querySelector('.tr-count').appendChild(tag);
+        });
+        var a = startLine.querySelector('a');
+        a.textContent = role.startLabel;
+        a.setAttribute('href', role.start);
+        startLine.hidden = !role.startLabel;
+      } else {
+        startLine.hidden = true;
+      }
+      order.forEach(function (li) { topicList.appendChild(li); });
+      store('mesh-role', role ? id : '');
+    }
+    rolePick.querySelectorAll('[data-role]').forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        applyRole(chip.getAttribute('aria-pressed') === 'true' ? '' : chip.dataset.role);
+      });
+    });
+    var savedRole = store('mesh-role');
+    if (savedRole) applyRole(savedRole);
+  }
+
+  // ---------- Saved guides (kept on this phone) ----------
+
+  function readSaved() {
+    try { return JSON.parse(store('mesh-saved') || '[]') || []; } catch (e) { return []; }
+  }
+  var saveBtn = doc.querySelector('[data-save]');
+  if (saveBtn) {
+    var me = saveBtn.dataset.save;
+    function paintSave() {
+      var on = readSaved().some(function (x) { return x.u === me; });
+      saveBtn.setAttribute('aria-pressed', String(on));
+      saveBtn.querySelector('span').textContent = on ? 'Saved' : 'Save';
+    }
+    saveBtn.addEventListener('click', function () {
+      var list = readSaved();
+      var on = list.some(function (x) { return x.u === me; });
+      list = on ? list.filter(function (x) { return x.u !== me; })
+        : [{ u: me, t: saveBtn.dataset.saveTitle, c: saveBtn.dataset.saveTopic }].concat(list);
+      store('mesh-saved', JSON.stringify(list));
+      paintSave();
+    });
+    paintSave();
+  }
+  var savedBox = doc.querySelector('[data-saved-list]');
+  if (savedBox) {
+    var renderSaved = function () {
+      var list = readSaved();
+      var ul = savedBox.querySelector('ul');
+      ul.textContent = '';
+      list.forEach(function (x) {
+        var li = doc.createElement('li');
+        li.className = 'saved-item';
+        var a = doc.createElement('a');
+        a.className = 'post-row';
+        a.href = pageUrl(x.u);
+        var t = doc.createElement('span'); t.className = 'pr-title'; t.textContent = x.t;
+        var c = doc.createElement('span'); c.className = 'pr-meta'; c.textContent = x.c;
+        a.appendChild(t); a.appendChild(c);
+        var rm = doc.createElement('button');
+        rm.type = 'button';
+        rm.className = 'saved-remove';
+        rm.setAttribute('aria-label', 'Remove ' + x.t + ' from saved');
+        rm.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>';
+        rm.addEventListener('click', function () {
+          store('mesh-saved', JSON.stringify(readSaved().filter(function (y) { return y.u !== x.u; })));
+          renderSaved();
+        });
+        li.appendChild(a); li.appendChild(rm);
+        ul.appendChild(li);
+      });
+      savedBox.hidden = !list.length;
+    };
+    renderSaved();
+  }
+
+  // ---------- Tap a local word to see what it means ----------
+
+  var termsData = doc.getElementById('mesh-terms');
+  if (termsData) {
+    var terms = {};
+    try { terms = JSON.parse(termsData.textContent); } catch (e) { terms = {}; }
+    var sheet = doc.createElement('div');
+    sheet.className = 'term-sheet';
+    sheet.setAttribute('role', 'dialog');
+    sheet.setAttribute('aria-modal', 'false');
+    sheet.hidden = true;
+    sheet.innerHTML = '<div class="ts-head"><p class="ts-term"></p><p class="ts-ar ar" lang="ar" dir="rtl"></p></div><p class="ts-meaning"></p><a class="ts-link"></a>' +
+      '<button type="button" class="icon-btn ts-close" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>';
+    doc.body.appendChild(sheet);
+    var openTerm = null;
+    function closeTerm() {
+      if (!openTerm) return;
+      sheet.hidden = true;
+      openTerm.setAttribute('aria-expanded', 'false');
+      var back = openTerm;
+      openTerm = null;
+      return back;
+    }
+    doc.querySelectorAll('.term').forEach(function (btn) {
+      btn.setAttribute('aria-expanded', 'false');
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (openTerm === btn) { closeTerm(); return; }
+        closeTerm();
+        var d = terms[btn.dataset.term];
+        if (!d) return;
+        sheet.querySelector('.ts-term').textContent = d.t;
+        var arEl = sheet.querySelector('.ts-ar');
+        arEl.textContent = d.a; arEl.hidden = !d.a;
+        sheet.querySelector('.ts-meaning').textContent = d.m;
+        var l = sheet.querySelector('.ts-link');
+        l.hidden = !d.l || location.pathname.indexOf(d.l.replace(/^(\.\.\/)+/, '').replace(/index\.html$/, '')) >= 0;
+        if (d.l) { l.href = d.l; l.textContent = 'Read the guide'; }
+        sheet.setAttribute('aria-label', d.t);
+        sheet.hidden = false;
+        btn.setAttribute('aria-expanded', 'true');
+        openTerm = btn;
+      });
+    });
+    sheet.querySelector('.ts-close').addEventListener('click', function () { var b = closeTerm(); if (b) b.focus(); });
+    sheet.addEventListener('click', function (e) { e.stopPropagation(); });
+    doc.addEventListener('click', closeTerm);
+    doc.addEventListener('keydown', function (e) { if (e.key === 'Escape') { var b = closeTerm(); if (b) b.focus(); } });
+  }
+
   // ---------- giant wordmarks: fit the four letters to the full width ----------
 
   function fitWordmarks() {

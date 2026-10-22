@@ -89,6 +89,9 @@ One or two lines: what to order, when to go.
 ```
 Coordinates must come from the owner or a shared maps link. Never guess a location.
 
+- **Glossary** `content/glossary.json`: local words (iqama, Absher, Raqm al-Hudood…) with Arabic and a one-line meaning. The first mention in each guide becomes a dotted word; tapping it shows the meaning. Meanings must come from what the guides (or the owner) say. Optional `match` (other spellings) and `link` (a guide). Add a word when a new guide explains a new local term.
+- Guides with 3 or more `##` headings get a contents box at the top ("7 steps · 2 min read") automatically.
+- **Home shortcuts** in `site.json`: `popular` (the question chips under the search bar: label + page) and `roles` (the "I am a…" chips: which topics go first and the "Start here" page). The build stops if a page doesn't exist. Keep these pointing at the most useful guides as content grows.
 - `checklist: true` turns a guide's `##` steps into tick boxes with a progress bar. Ticks are saved on the reader's phone (used on the new-student steps).
 
 **Markdown extras**
@@ -120,8 +123,8 @@ The look comes from the MESH logo. Keep it.
 - **One bold thing per page:** the giant MESH on the home page, the topic name on topic pages. Everything around it stays quiet.
 - **Motion** is limited to what exists (owner approved all of it): the home entrance, the wordmark drifting on scroll, the footer letters rising, topic rows sweeping on hover, page transitions, the theme reveal, plus small ambient touches: a gold light drifting along the lattice in the hero and green bands, a glint on the gold rule, the rotating search hint, a light passing over the next-date card with a breathing countdown, arrows nudging in on the topic list, rippling map pins and turning landmark diamonds. Don't add fade-ins to sections. Everything switches off with reduced motion.
 - No emoji in the interface. Icons come only from the set in `tools/templates.mjs`.
-- Button words stay the same everywhere: "Ask MESH", "Share a tip", "Copy prompt", "Directions", "Send to MESH", "Share on WhatsApp", "Add to calendar".
-- **Features (owner approved, October 2026):** every guide has a "Share on WhatsApp" button under its date; the home page's "What's new" marks guides updated since the reader's last visit; the live site is installable (manifest + `tools/sw.js`, copied to `dist/sw.js` with every page precached for offline reading; the About page explains Add to Home Screen). The service worker skips `assets/files/tawsif/` (too big). The home screen and offline parts run only in the live build, not the preview.
+- Button words stay the same everywhere: "Ask MESH", "Share a tip", "Copy prompt", "Directions", "Send to MESH", "Share on WhatsApp", "Add to calendar", "Save".
+- **Features (owner approved, October 2026):** every guide has "Share on WhatsApp" and "Save" buttons under its date (saved guides show on the home page, kept on the reader's phone); the home page has popular-question chips under the search and an "I am a…" picker that puts that reader's topics first; calendar files remind the day before at 9:00; the home page's "What's new" marks guides updated since the reader's last visit; the live site is installable (manifest + `tools/sw.js`, copied to `dist/sw.js` with every page precached for offline reading; the About page explains Add to Home Screen). The service worker skips `assets/files/tawsif/` (too big). The home screen and offline parts run only in the live build, not the preview.
 - Must work at 360px wide with no sideways scrolling, with a keyboard, and in both themes.
 
 ## Before pushing

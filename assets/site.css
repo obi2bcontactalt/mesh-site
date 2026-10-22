@@ -350,7 +350,9 @@ p { margin: 0; }
 .hero-foot { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.1rem; margin-top: clamp(1rem, 0.5rem + 2vw, 2.5rem); }
 .hero-lede { font-size: var(--step-1); max-width: 34ch; }
 @media (min-width: 900px) {
-  .hero-foot { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "lede search" "today search"; align-items: end; column-gap: 3rem; }
+  .hero-foot { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "lede search" "today popular"; align-items: end; column-gap: 3rem; }
+  .popular { grid-area: popular; justify-self: end; width: min(100%, 34rem); }
+  .popular ul { flex-wrap: wrap; justify-content: flex-end; overflow: visible; margin: 0; padding: 0; }
   .hero-lede { grid-area: lede; font-size: var(--step-2); line-height: 1.35; }
   .today { grid-area: today; }
   .search-trigger { grid-area: search; justify-self: end; align-self: end; }
@@ -1176,7 +1178,7 @@ html.theme-switching::view-transition-new(root) { animation: theme-reveal 0.6s v
 
 /* ---------- share a guide ---------- */
 
-.post-share { margin-top: 0.4rem; }
+.post-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.4rem; }
 
 /* ---------- What's new ---------- */
 
@@ -1198,3 +1200,62 @@ html.theme-switching::view-transition-new(root) { animation: theme-reveal 0.6s v
 .check-box[aria-checked="true"] svg { opacity: 1; transform: none; }
 .post-body > h2.is-done { opacity: 0.75; }
 .post-body > .sec-body.is-done { opacity: 0.55; }
+
+/* ---------- popular questions under the search bar ---------- */
+
+.popular { min-width: 0; margin-top: -0.35rem; }
+.popular ul { display: flex; gap: 0.45rem; list-style: none; margin: 0 calc(var(--gutter-r) * -1) 0 0; padding: 0.15rem var(--gutter-r) 0.15rem 0; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; }
+.popular ul::-webkit-scrollbar { display: none; }
+.popular li { flex: none; scroll-snap-align: start; }
+.popular a { display: inline-flex; align-items: center; min-height: 40px; padding: 0.35em 0.95em; border: 1.5px solid var(--line); border-radius: 999px; font-size: var(--step--1); font-weight: 600; text-decoration: none; white-space: nowrap; background: var(--bg); transition: border-color 0.2s, background-color 0.2s; }
+.popular a:hover { border-color: var(--fg-muted); }
+
+/* ---------- I am a… ---------- */
+
+.role-pick { display: grid; gap: 0.6rem; margin-bottom: 1.4rem; }
+.rp-q { font-weight: 800; font-size: var(--step-1); }
+.role-pick .chips { margin-bottom: 0; }
+.rp-start { font-weight: 600; }
+.rp-start a { font-weight: 800; text-decoration-color: var(--gold); text-decoration-thickness: 2px; text-underline-offset: 0.2em; }
+.for-you { display: inline-block; margin-left: 0.6em; padding: 0.1em 0.6em; border-radius: 999px; background: var(--gold); color: var(--on-gold); font-size: 0.75rem; font-weight: 800; vertical-align: 0.1em; }
+
+/* ---------- saved guides ---------- */
+
+.saved { padding-bottom: 1rem; }
+.saved-item { display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid var(--line); }
+.saved-item .post-row { flex: 1; min-width: 0; border-bottom: 0; }
+.saved-remove { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 999px; background: transparent; color: var(--fg-muted); cursor: pointer; }
+.saved-remove:hover { color: var(--fg); background: color-mix(in srgb, var(--fg) 8%, transparent); }
+.saved-remove svg, .save-btn svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.save-btn[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: var(--on-gold); }
+.save-btn[aria-pressed="true"] svg { fill: currentColor; }
+
+/* ---------- contents box at the top of longer guides ---------- */
+
+.toc { padding: 1rem 1.15rem 1.1rem; border-radius: var(--radius-small); background: var(--bg-raised); }
+.toc-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.25rem 1rem; margin-bottom: 0.5rem; }
+.toc-head span { color: var(--fg-muted); font-size: var(--step--1); font-weight: 600; }
+.prose .toc ol { margin: 0; padding-left: 1.4em; display: grid; gap: 0.1rem; }
+.prose .toc ol.toc-plain { list-style: none; padding-left: 0; }
+.prose .toc li { margin: 0; padding-left: 0.2em; }
+.prose .toc li::marker { font-weight: 800; color: var(--fg-muted); }
+.prose .toc a { display: inline-block; padding-block: 0.3rem; font-weight: 600; text-decoration-thickness: 1.5px; }
+
+/* ---------- tap a local word to see what it means ---------- */
+
+.term { display: inline; padding: 0; margin: 0; border: 0; background: none; font: inherit; color: inherit; cursor: pointer; text-decoration: underline dotted; text-decoration-color: var(--gold-ink); text-decoration-thickness: 2px; text-underline-offset: 0.22em; border-radius: 3px; }
+.term[aria-expanded="true"] { background: color-mix(in srgb, var(--gold) 30%, transparent); }
+.term-sheet { position: fixed; z-index: 70; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); max-width: 30rem; margin-inline: auto; display: grid; gap: 0.45rem; padding: 1rem 3.5rem 1.15rem 1.15rem; border-radius: var(--radius); background: var(--band-bg); color: var(--band-fg); box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.45); }
+.term-sheet[hidden] { display: none; }
+.ts-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.2rem 0.8rem; }
+.ts-term { font-family: var(--font-display); font-weight: 800; font-size: var(--step-1); }
+.ts-ar { color: var(--gold); font-size: var(--step-1); }
+.ts-meaning { color: var(--band-fg); }
+.ts-link { justify-self: start; color: var(--band-fg); font-weight: 700; text-decoration-color: var(--gold); text-decoration-thickness: 2px; text-underline-offset: 0.2em; }
+.ts-link[hidden] { display: none; }
+.ts-close { position: absolute; top: 0.5rem; right: 0.5rem; color: var(--band-fg); }
+.ts-close:hover { background: rgba(255, 255, 255, 0.12); }
+@media (prefers-reduced-motion: no-preference) {
+  .term-sheet:not([hidden]) { animation: sheet-up 0.25s var(--ease) both; }
+}
+@keyframes sheet-up { from { opacity: 0; transform: translateY(12px); } }

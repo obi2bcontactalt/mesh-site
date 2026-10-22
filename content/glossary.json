@@ -1,0 +1,63 @@
+[
+  {
+    "term": "iqama",
+    "arabic": "إقامة",
+    "meaning": "Your residency card in Saudi Arabia."
+  },
+  {
+    "term": "Zaair ID",
+    "arabic": "",
+    "meaning": "Your study visa ID. New students get it after the medical tests, the border number and Absher.",
+    "link": "admissions/new-student-steps/"
+  },
+  {
+    "term": "Absher",
+    "arabic": "أبشر",
+    "meaning": "The government services app. You create your account with your border number and verify it through Nafath."
+  },
+  {
+    "term": "Nafath",
+    "arabic": "نفاذ",
+    "meaning": "The app that verifies your identity, used to confirm your Absher account."
+  },
+  {
+    "term": "Raqm al-Hudood",
+    "arabic": "رقم الحدود",
+    "meaning": "Your border number. You collect it from Idarat as-Safar and use it to open Absher."
+  },
+  {
+    "term": "Idarat as-Safar",
+    "arabic": "إدارة السفر",
+    "meaning": "The travel and passport office."
+  },
+  {
+    "term": "Maktab 22",
+    "arabic": "",
+    "meaning": "The Istiqbal office at the university, where you get your student card and sign up for your bank card."
+  },
+  {
+    "term": "ta'jeel",
+    "match": [
+      "ta'jeel",
+      "tajeel"
+    ],
+    "arabic": "تأجيل",
+    "meaning": "Postponing a semester.",
+    "link": "admissions/tajeel-and-itithaar/"
+  },
+  {
+    "term": "i'tithaar",
+    "match": [
+      "i'tithaar",
+      "itithaar"
+    ],
+    "arabic": "اعتذار",
+    "meaning": "Withdrawing during a semester.",
+    "link": "admissions/tajeel-and-itithaar/"
+  },
+  {
+    "term": "mushrif",
+    "arabic": "مشرف",
+    "meaning": "The supervisor of your building in student housing."
+  }
+]

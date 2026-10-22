@@ -29,6 +29,9 @@ const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 // ---------- load ----------
 
 const site = JSON.parse(fs.readFileSync(path.join(ROOT, 'site.json'), 'utf8'));
+// Local words explained on tap in guides (content/glossary.json). Meanings come from the guides themselves.
+const glossary = fs.existsSync(path.join(ROOT, 'content/glossary.json'))
+  ? JSON.parse(fs.readFileSync(path.join(ROOT, 'content/glossary.json'), 'utf8')) : [];
 
 function readMarkdownDir(dir) {
   const abs = path.join(ROOT, dir);
@@ -252,6 +255,42 @@ const plain = (html) => html.replace(/<[^>]+>/g, ' ')
   .replace(/&(amp|lt|gt|quot|#39|nbsp);/g, (_, e) => ENTITIES[e]).replace(/&[a-z#0-9]+;/gi, ' ')
   .replace(/\s+/g, ' ').trim();
 
+// Wrap the first mention of each glossary word in a guide in a tap-to-explain button.
+// Skips headings, links, code, prompt cards and buttons.
+function explainTerms(html) {
+  const used = [];
+  const left = glossary.map((g, i) => ({ i, g, re: new RegExp(`(^|[^\\w'])(${(g.match || [g.term]).map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})(?![\\w'])`, 'i') }));
+  const SKIP = /^(a|h1|h2|h3|h4|code|pre|button|summary|figcaption)$/;
+  const stack = [];
+  let skipDepth = 0;
+  const out = html.split(/(<[^>]+>)/).map((tok) => {
+    const tag = tok.match(/^<(\/?)([a-z0-9]+)/i);
+    if (tag) {
+      const name = tag[2].toLowerCase();
+      const closing = tag[1] === '/';
+      const isSkip = SKIP.test(name) || (name === 'div' && /class="[^"]*prompt/.test(tok));
+      if (!closing && !/\/>$/.test(tok) && !/^(br|img|hr|input|meta|link|source|col|wbr)$/.test(name)) {
+        stack.push(isSkip); if (isSkip) skipDepth++;
+      } else if (closing) {
+        const was = stack.pop(); if (was) skipDepth--;
+      }
+      return tok;
+    }
+    if (skipDepth > 0 || !tok.trim()) return tok;
+    for (const item of left) {
+      if (item.done) continue;
+      const m = tok.match(item.re);
+      if (!m) continue;
+      item.done = true;
+      used.push(item.g);
+      const at = m.index + m[1].length;
+      tok = tok.slice(0, at) + `<button type="button" class="term" data-term="${item.i}">${m[2]}</button>` + tok.slice(at + m[2].length);
+    }
+    return tok;
+  }).join('');
+  return [out, used.map((g) => ({ ...g, i: glossary.indexOf(g) }))];
+}
+
 // ---------- derived data ----------
 
 for (const t of topics) t.introHtml = md(t._body, 1);
@@ -290,7 +329,26 @@ for (const t of topics) {
   if (!t.count) t.count = 'Coming soon';
 }
 
-const ctx = { site, topics, topicBySlug, posts, events, restaurants, link, depthOf, md, PREVIEW, TODAY, assetVersion: '' };
+// Check that the shortcuts in site.json and glossary links point at real pages.
+{
+  const pages = new Set(['calendar/', ...topics.map((t) => t.slug + '/'), ...posts.map((p) => `${p.topic}/${p.slug}/`)]);
+  const check = (where, page) => { if (page && !pages.has(page.split('#')[0])) problem(`${where}: "${page}" isn't a page on the site.`); };
+  for (const q of site.popular || []) check('site.json popular', q.page);
+  for (const r of site.roles || []) {
+    check(`site.json roles (${r.label})`, r.start);
+    for (const t of r.topics || []) if (!topicBySlug[t]) problem(`site.json roles (${r.label}): no topic called "${t}".`);
+    if (!r.startLabel) { const p = posts.find((x) => `${x.topic}/${x.slug}/` === r.start); r.startLabel = p ? p.title : ''; }
+  }
+  for (const g of glossary) { if (!g.term || !g.meaning) problem('content/glossary.json: every entry needs "term" and "meaning".'); check(`content/glossary.json (${g.term})`, g.link); }
+}
+if (problems.length) {
+  console.error('\nThe site was not built. Fix these first:\n');
+  for (const p of problems) console.error('  • ' + p);
+  console.error('');
+  process.exit(1);
+}
+
+const ctx = { site, glossary, topics, topicBySlug, posts, events, restaurants, link, depthOf, md, PREVIEW, TODAY, assetVersion: '' };
 
 // ---------- write ----------
 
@@ -326,6 +384,10 @@ for (const t of topics) {
   page(`${t.slug}/`, T.topicPage(ctx, t));
   for (const p of t.posts) {
     p.html = sectionise(md(p._body, 2));
+    p.toc = [...p.html.matchAll(/<h2 id="([^"]+)">([\s\S]*?)<\/h2>/g)].map((m) => ({ id: m[1], text: plain(m[2]).replace(/^\d+\.\s*/, '') }));
+    p.numbered = /<h2 id="[^"]+">\s*1\./.test(p.html);
+    p.minutes = Math.max(1, Math.round(plain(p.html).split(' ').length / 200));
+    if (p.type !== 'prompt') [p.html, p.terms] = explainTerms(p.html);
     page(`${t.slug}/${p.slug}/`, T.postPage(ctx, t, p));
   }
 }
@@ -361,7 +423,9 @@ fs.writeFileSync(path.join(OUT, 'search-index.json'), JSON.stringify(index));
   const vevent = (e) => {
     const desc = [e.arabic, e.hijri + (e.end ? ` to ${e.hijriEnd}` : ''), e.expected ? 'Expected date: confirmed by moon sighting.' : (e.term ? `${e.term}, from the Islamic University academic calendar.` : ''), plain(e.noteHtml), base ? `${base}/calendar/#${e.slug}` : ''].filter(Boolean).join('\n');
     return ['BEGIN:VEVENT', `UID:${e.slug}@mesh`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${ymd(e.date)}`, `DTEND;VALUE=DATE:${ymd(nextDay(e.end || e.date))}`,
-      `SUMMARY:${esc(e.title)}`, `DESCRIPTION:${esc(desc)}`, base ? `URL:${base}/calendar/#${e.slug}` : '', 'TRANSP:TRANSPARENT', 'END:VEVENT'].filter(Boolean);
+      `SUMMARY:${esc(e.title)}`, `DESCRIPTION:${esc(desc)}`, base ? `URL:${base}/calendar/#${e.slug}` : '', 'TRANSP:TRANSPARENT',
+      // reminder at 9:00 the day before
+      'BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:Tomorrow: ${esc(e.title)}`, 'TRIGGER:-PT15H', 'END:VALARM', 'END:VEVENT'].filter(Boolean);
   };
   const cal = (list, name) => ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//MESH//Medina English Student Hub//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', `X-WR-CALNAME:${esc(name)}`, ...list.flatMap(vevent), 'END:VCALENDAR'].map(fold).join('\r\n') + '\r\n';
   const dir = path.join(OUT, 'calendar');

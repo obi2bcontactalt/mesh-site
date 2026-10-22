@@ -17,5 +17,82 @@
       "lat": 24.4808,
       "lng": 39.5576
     }
+  ],
+  "popular": [
+    {
+      "label": "Exam dates",
+      "page": "calendar/#glance"
+    },
+    {
+      "label": "Zaair ID and student card",
+      "page": "admissions/new-student-steps/"
+    },
+    {
+      "label": "Bank card",
+      "page": "admissions/new-student-steps/#7-bank-card"
+    },
+    {
+      "label": "Taking a semester off",
+      "page": "admissions/tajeel-and-itithaar/"
+    },
+    {
+      "label": "Driver's license",
+      "page": "visas/drivers-license/"
+    },
+    {
+      "label": "Finding a flat",
+      "page": "daily-life/finding-an-apartment/"
+    },
+    {
+      "label": "Emergency numbers",
+      "page": "daily-life/emergency-numbers/"
+    }
+  ],
+  "roles": [
+    {
+      "id": "new",
+      "label": "New student",
+      "topics": [
+        "admissions",
+        "visas",
+        "daily-life",
+        "calendar"
+      ],
+      "start": "admissions/new-student-steps/"
+    },
+    {
+      "id": "student",
+      "label": "Student",
+      "topics": [
+        "calendar",
+        "study",
+        "admissions",
+        "daily-life"
+      ],
+      "start": "calendar/#glance",
+      "startLabel": "What's coming up on the calendar"
+    },
+    {
+      "id": "family",
+      "label": "Sister or family",
+      "topics": [
+        "family",
+        "daily-life",
+        "visas",
+        "calendar"
+      ],
+      "start": "family/sisters-studying-in-madinah/"
+    },
+    {
+      "id": "graduate",
+      "label": "Graduate",
+      "topics": [
+        "graduates",
+        "visas",
+        "calendar",
+        "study"
+      ],
+      "start": "graduates/graduate-procedures/"
+    }
   ]
 }

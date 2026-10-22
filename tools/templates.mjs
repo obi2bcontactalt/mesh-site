@@ -22,6 +22,7 @@ const icon = {
   back: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>',
   calendarAdd: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M8.5 3v4M15.5 3v4M12 13v5M9.5 15.5h5"/></svg>',
   share: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a8 8 0 0 1-11.7 7.1L4 20l1.4-4.1A8 8 0 1 1 20 11.5Z"/><path d="M9 10.5h6M9 13.5h4"/></svg>',
+  star: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3.6 2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8Z"/></svg>',
   check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
   pin: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.3"/></svg>',
 };
@@ -261,7 +262,7 @@ export function homePage(ctx) {
   <script type="application/json" id="mesh-events">${eventsJson}</script>
 </section>` : '';
 
-  const rows = topics.map((t) => `<li>
+  const rows = topics.map((t) => `<li data-topic="${t.slug}">
       <a class="topic-row" href="${link(depth, t.slug + '/')}">
         <span class="tr-en" style="view-transition-name: t-${t.slug}">${esc(t.title)}</span>
         ${ar(t.arabic, 'tr-ar')}
@@ -271,6 +272,10 @@ export function homePage(ctx) {
       </a>
     </li>`).join('');
 
+  const savedSection = `<section class="wrap saved" aria-labelledby="saved-h" data-saved-list hidden>
+  <h2 id="saved-h" class="section-title">Saved</h2>
+  <ul class="post-list"></ul>
+</section>`;
   const recent = posts.slice(0, 6);
   const recentSection = recent.length ? `<section class="wrap recent" aria-labelledby="recent-h" data-whats-new>
   <h2 id="recent-h" class="section-title">What’s new</h2>
@@ -288,6 +293,7 @@ export function homePage(ctx) {
     <div class="hero-foot">
       <p class="hero-lede">${esc(site.description)}</p>
       <button type="button" class="search-trigger" data-open-search>${icon.search}<span data-hint-cycle>Search visas, exams, food…</span><kbd>/</kbd></button>
+      ${(site.popular || []).length ? `<nav class="popular" aria-label="Popular questions"><ul>${site.popular.map((q) => `<li><a href="${link(depth, q.page)}">${esc(q.label)}</a></li>`).join('')}</ul></nav>` : ''}
       <p class="today" data-hijri-today>Today is ${esc(hijriText(TODAY))}, ${esc(new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(TODAY + 'T00:00:00Z')))}.</p>
     </div>
   </div>
@@ -295,8 +301,14 @@ export function homePage(ctx) {
 ${nextUp}
 <section class="wrap topics" aria-labelledby="topics-h">
   <h2 id="topics-h" class="section-title">Find it by topic</h2>
+  ${(site.roles || []).length ? `<div class="role-pick" data-roles="${esc(JSON.stringify(site.roles.map((r) => ({ id: r.id, topics: r.topics, start: link(depth, r.start), startLabel: r.startLabel }))))}">
+    <p class="rp-q" id="rp-q">I am a…</p>
+    <div class="chips" role="group" aria-labelledby="rp-q">${site.roles.map((r) => `<button type="button" class="chip" aria-pressed="false" data-role="${r.id}">${esc(r.label)}</button>`).join('')}</div>
+    <p class="rp-start" data-role-start hidden>Start here: <a href="#"></a></p>
+  </div>` : ''}
   <ul class="topic-list">${rows}</ul>
 </section>
+${savedSection}
 ${recentSection}
 ${askBand(ctx, depth)}`;
 
@@ -502,11 +514,18 @@ function km(a, b) {
 
 // ---------- post ----------
 
+// At the top of longer guides: how long it takes to read and a link to each part.
+function guideContents(p) {
+  if (!p.toc || p.toc.length < 3 || p.type === 'prompt') return '';
+  const what = p.numbered ? 'steps' : 'parts';
+  return `<nav class="toc" aria-label="In this guide"><p class="toc-head"><b>${p.toc.length} ${what}</b><span>${p.minutes} min read</span></p><ol${p.numbered ? '' : ' class="toc-plain"'}>${p.toc.map((h) => `<li><a href="#${h.id}">${esc(h.text)}</a></li>`).join('')}</ol></nav>`;
+}
+
 // Share a guide on WhatsApp: opens WhatsApp with the title and the link ready to send.
 function shareButton(ctx, t, p) {
   const base = (ctx.site.url || '').replace(/\/$/, '');
   const text = `${p.title} (MESH)\n${base}/${t.slug}/${p.slug}/`;
-  return `<p class="post-share"><a class="btn btn-small btn-ghost" href="https://wa.me/?text=${encodeURIComponent(text)}" target="_blank" rel="noopener">${icon.share}Share on WhatsApp</a></p>`;
+  return `<a class="btn btn-small btn-ghost" href="https://wa.me/?text=${encodeURIComponent(text)}" target="_blank" rel="noopener">${icon.share}Share on WhatsApp</a>`;
 }
 
 export function postPage(ctx, t, p) {
@@ -519,9 +538,9 @@ export function postPage(ctx, t, p) {
     <h1 class="post-title">${esc(p.title)}${badge(p)}</h1>
     <p class="post-summary">${esc(p.summary)}</p>
     <p class="post-meta">Updated <time datetime="${p.updated}">${esc(fmtDate(p.updated))}</time>${p.source ? `. ${esc(p.source)}` : ''}</p>
-    ${shareButton(ctx, t, p)}
+    <p class="post-actions">${shareButton(ctx, t, p)}<button type="button" class="btn btn-small btn-ghost save-btn" data-save="${t.slug}/${p.slug}/" data-save-title="${esc(p.title)}" data-save-topic="${esc(t.title)}" aria-pressed="false">${icon.star}<span>Save</span></button></p>
   </header>
-  <div class="prose post-body"${p.checklist ? ` data-checklist="${t.slug}/${p.slug}"` : ''}>${p.checklist ? `<div class="check-progress" data-check-progress hidden><p><b data-check-count></b> <span data-check-text></span></p><div class="check-bar" aria-hidden="true"><span data-check-bar></span></div><button type="button" class="check-reset" data-check-reset>Start again</button></div>` : ''}${p.html}</div>
+  <div class="prose post-body"${p.checklist ? ` data-checklist="${t.slug}/${p.slug}"` : ''}>${p.checklist ? `<div class="check-progress" data-check-progress hidden><p><b data-check-count></b> <span data-check-text></span></p><div class="check-bar" aria-hidden="true"><span data-check-bar></span></div><button type="button" class="check-reset" data-check-reset>Start again</button></div>` : ''}${guideContents(p)}${p.html}</div>${p.terms && p.terms.length ? `<script type="application/json" id="mesh-terms">${JSON.stringify(Object.fromEntries(p.terms.map((g) => [g.i, { t: g.term, a: g.arabic || '', m: g.meaning, l: g.link ? link(depth, g.link) : '' }]))).replace(/</g, '\\u003c')}</script>` : ''}
   <p class="post-fix">Something out of date? <a href="${link(depth, 'ask/')}?type=fix&topic=${t.slug}&page=${encodeURIComponent(t.slug + '/' + p.slug + '/')}">Tell us and we’ll fix it</a>.</p>
 </article>
 ${more.length ? `<section class="wrap more" aria-labelledby="more-h"><h2 id="more-h" class="section-title">More in ${esc(lowerFirst(t.title))}</h2>${postList(ctx, depth, more)}</section>` : ''}
