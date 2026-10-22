@@ -418,7 +418,7 @@ function restaurantWidget(ctx, depth) {
   }).join('');
   const pins = restaurants.map((r) => {
     const [x, y] = px(r);
-    return `<a class="map-pin" href="#${r.slug}" aria-label="${esc(r.name)}"><g transform="translate(${x} ${y})"><circle r="20" class="pin-halo"/><circle r="10" class="pin-dot"/></g></a>`;
+    return `<a class="map-pin" href="#${r.slug}" aria-label="${esc(r.name)}"><g transform="translate(${x} ${y})"><circle r="46" class="pin-hit"/><circle r="20" class="pin-halo"/><circle r="10" class="pin-dot"/></g></a>`;
   }).join('');
   const svg = `<svg class="map-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Map of restaurant locations relative to Masjid an-Nabawi and the Islamic University">
     <defs>${latticeDefs('map-lattice', 36)}</defs>

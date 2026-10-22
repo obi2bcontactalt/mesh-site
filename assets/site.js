@@ -291,8 +291,10 @@
     resultsBox.innerHTML = '<p class="search-hint">Search every guide, date and restaurant. Arabic works too.</p><div class="quick-links">' +
       links.map(function (l) { return '<a href="' + pageUrl(l[0]) + '">' + l[1] + '</a>'; }).join('') + '</div>';
   }
-  function openSearch() {
+  function openSearch(instant) {
     if (!searchSheet) return;
+    // keyboard shortcuts open search at once, without the slide-in
+    searchSheet.classList.toggle('is-instant', instant === true);
     openSheet(searchSheet);
     searchInput.value = '';
     renderIdle();
@@ -336,7 +338,7 @@
     var typing = tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable;
     if (!typing && (e.key === '/' || ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k'))) {
       e.preventDefault();
-      openSearch();
+      openSearch(true);
     }
   });
 
