@@ -100,6 +100,7 @@ for (const t of topics) {
       order: typeof p.data.order === 'number' ? p.data.order : 999,
       example: !!p.data.example,
       draft: !!p.data.draft,
+      checklist: !!p.data.checklist,
       _body: p.body,
       file: p.file,
     });
@@ -119,7 +120,7 @@ posts.sort((a, b) => (b.updated || '').localeCompare(a.updated || '') || a.title
 const topicOrder = (list) => [...list].sort((a, b) => a.order - b.order);
 
 // Calendar
-const KINDS = { islamic: 'Islamic', national: 'Saudi', university: 'University', other: 'Other' };
+const KINDS = { islamic: 'Islamic dates', national: 'Saudi', university: 'University', other: 'Other' };
 const events = readMarkdownDir('content/calendar').map((e) => {
   need(e, ['title', 'date']);
   if (e.data.date && !isIsoDate(e.data.date)) problem(`${e.file}: "date" must look like 2027-02-08.`);
@@ -340,8 +341,57 @@ for (const e of events) index.push({ u: `calendar/#${e.slug}`, t: e.title, c: 'C
 for (const r of restaurants) index.push({ u: `restaurants/#${r.slug}`, t: r.name, c: 'Restaurants', s: [r.cuisine, r.area].filter(Boolean).join(', '), a: r.arabic, x: plain(r.noteHtml) + ' ' + r.tags.join(' ') });
 fs.writeFileSync(path.join(OUT, 'search-index.json'), JSON.stringify(index));
 
+// calendar files: one .ics per date (tap to add it to the phone's calendar) and one with every date
+{
+  const base = (site.url || '').replace(/\/$/, '');
+  const esc = (t) => String(t).replace(/\\/g, '\\\\').replace(/[,;]/g, (c) => '\\' + c).replace(/\n/g, '\\n');
+  const ymd = (iso) => iso.replace(/-/g, '');
+  const nextDay = (iso) => new Date(Date.parse(iso + 'T00:00:00Z') + 86400000).toISOString().slice(0, 10);
+  const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z');
+  // fold long lines at 74 bytes as the format asks
+  const fold = (line) => {
+    const out = []; let cur = '';
+    for (const ch of line) {
+      if (Buffer.byteLength(cur + ch) > (out.length ? 73 : 74)) { out.push(cur); cur = ''; }
+      cur += ch;
+    }
+    out.push(cur);
+    return out.join('\r\n ');
+  };
+  const vevent = (e) => {
+    const desc = [e.arabic, e.hijri + (e.end ? ` to ${e.hijriEnd}` : ''), e.expected ? 'Expected date: confirmed by moon sighting.' : (e.term ? `${e.term}, from the Islamic University academic calendar.` : ''), plain(e.noteHtml), base ? `${base}/calendar/#${e.slug}` : ''].filter(Boolean).join('\n');
+    return ['BEGIN:VEVENT', `UID:${e.slug}@mesh`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${ymd(e.date)}`, `DTEND;VALUE=DATE:${ymd(nextDay(e.end || e.date))}`,
+      `SUMMARY:${esc(e.title)}`, `DESCRIPTION:${esc(desc)}`, base ? `URL:${base}/calendar/#${e.slug}` : '', 'TRANSP:TRANSPARENT', 'END:VEVENT'].filter(Boolean);
+  };
+  const cal = (list, name) => ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//MESH//Medina English Student Hub//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', `X-WR-CALNAME:${esc(name)}`, ...list.flatMap(vevent), 'END:VCALENDAR'].map(fold).join('\r\n') + '\r\n';
+  const dir = path.join(OUT, 'calendar');
+  fs.mkdirSync(dir, { recursive: true });
+  for (const e of events) fs.writeFileSync(path.join(dir, `${e.slug}.ics`), cal([e], 'MESH'));
+  fs.writeFileSync(path.join(dir, 'mesh-calendar.ics'), cal(events, 'MESH: university and Islamic dates'));
+}
+
 // live-site extras
 if (!PREVIEW) {
+  // Installable app + offline reading: a manifest and a service worker.
+  fs.writeFileSync(path.join(OUT, 'manifest.webmanifest'), JSON.stringify({
+    name: `${site.name}: ${site.fullName || 'Medina English Student Hub'}`,
+    short_name: site.name,
+    description: site.description,
+    start_url: '/',
+    scope: '/',
+    display: 'standalone',
+    background_color: '#F1EBDD',
+    theme_color: '#0F5A3B',
+    icons: [
+      { src: '/assets/img/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { src: '/assets/img/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+  }, null, 2));
+  const pages = written.map((k) => '/' + k);
+  const swVersion = crypto.createHash('sha1').update(ctx.assetVersion + pages.map((k) => fs.readFileSync(path.join(OUT, k, 'index.html'))).join('')).digest('hex').slice(0, 10);
+  fs.writeFileSync(path.join(OUT, 'sw.js'), fs.readFileSync(path.join(ROOT, 'tools/sw.js'), 'utf8')
+    .replace('__VERSION__', swVersion)
+    .replace('__PRECACHE__', JSON.stringify([...pages, `/assets/site.css?v=${ctx.assetVersion}`, `/assets/site.js?v=${ctx.assetVersion}`, '/search-index.json', '/assets/img/icon-192.png', '/assets/img/favicon.svg'])));
   const base = (site.url || '').replace(/\/$/, '');
   if (base) {
     const urls = written.map((k) => `  <url><loc>${base}/${k}</loc></url>`).join('\n');

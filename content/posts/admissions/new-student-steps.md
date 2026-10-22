@@ -3,9 +3,12 @@ title: First steps for new students: visa, ID, student card and bank card
 summary: What to do after you arrive, in order: paperwork, medical tests, your border number, Absher and Nafath, your Zaair ID, then your student and bank cards.
 updated: 2026-10-21
 source: From the MESH Telegram group, steps for new students in 1447 (2025)
+checklist: true
 tags: [new students, arrival, zaair id, iqama, medical test, raqm al-hudood, border number, absher, nafath, student card, bank card, idarat as-safar, maktab 22, رقم الحدود, أبشر, نفاذ]
 ---
 Do these in order. By the end you'll have three things: your **Zaair ID**, your **student card** and your **bank card**.
+
+Tick each step when it's done. Your ticks are saved on this phone, so you can come back to see what's left.
 
 ## 1. University paperwork
 

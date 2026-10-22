@@ -108,6 +108,130 @@
     });
   }
 
+  // Calendar quick view: one line per date, filtered to the next 2 months, 6 months or the whole year.
+  var glance = doc.querySelector('[data-glance]');
+  if (glance) {
+    var rows = Array.prototype.slice.call(glance.querySelectorAll('.gl-row')).filter(function (li) {
+      var text = countdownText(li.dataset.date, li.dataset.end, TODAY);
+      if (text === 'Passed') { li.remove(); return false; }
+      li.querySelector('[data-countdown]').textContent = text;
+      li.classList.toggle('is-now', text === 'Today' || text.indexOf('Ends') === 0);
+      return true;
+    });
+    var months = Array.prototype.slice.call(glance.querySelectorAll('.gl-month'));
+    var emptyNote = glance.querySelector('.gl-empty');
+    function showRange(range) {
+      rows.forEach(function (li) {
+        li.hidden = range !== 'all' && daysUntil(li.dataset.date, TODAY) > Number(range);
+      });
+      var any = false;
+      months.forEach(function (m) {
+        var visibleRow = m.querySelector('.gl-row:not([hidden])');
+        m.hidden = !visibleRow;
+        if (visibleRow) any = true;
+      });
+      emptyNote.hidden = any;
+    }
+    glance.querySelectorAll('[data-range]').forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        glance.querySelectorAll('[data-range]').forEach(function (c) { c.setAttribute('aria-pressed', String(c === chip)); });
+        showRange(chip.dataset.range);
+        store('mesh-glance', chip.dataset.range);
+      });
+    });
+    var saved = store('mesh-glance');
+    var start = glance.querySelector('[data-range="' + (saved || '60') + '"]') || glance.querySelector('[data-range="60"]');
+    start.click();
+  }
+
+  // ---------- What's new: mark guides updated since this phone's last visit ----------
+
+  var whatsNew = doc.querySelector('[data-whats-new]');
+  if (whatsNew) {
+    var visitDay = store('mesh-visit-day');
+    var prevDay = store('mesh-prev-day');
+    if (visitDay && visitDay !== TODAY) { prevDay = visitDay; store('mesh-prev-day', prevDay); }
+    store('mesh-visit-day', TODAY);
+    if (prevDay) {
+      var fresh = 0;
+      whatsNew.querySelectorAll('li[data-updated]').forEach(function (li) {
+        if (li.dataset.updated > prevDay) {
+          fresh++;
+          var tag = doc.createElement('span');
+          tag.className = 'new-tag';
+          tag.textContent = 'New';
+          li.querySelector('.pr-title').appendChild(tag);
+        }
+      });
+      var note = whatsNew.querySelector('[data-wn-note]');
+      var since = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', timeZone: 'UTC' }).format(asDate(prevDay));
+      note.textContent = fresh
+        ? (fresh === 1 ? '1 guide updated' : fresh + ' guides updated') + ' since your last visit on ' + since + '.'
+        : 'Nothing new since your last visit on ' + since + '.';
+      note.hidden = false;
+    }
+  }
+
+  // ---------- Checklist guides: tick each step; ticks are saved on this phone ----------
+
+  var checklist = doc.querySelector('[data-checklist]');
+  if (checklist) {
+    var key = 'mesh-check:' + checklist.dataset.checklist;
+    var done = {};
+    try { done = JSON.parse(store(key) || '{}') || {}; } catch (e) { done = {}; }
+    var steps = Array.prototype.slice.call(checklist.querySelectorAll(':scope > h2'));
+    var progress = checklist.querySelector('[data-check-progress]');
+    function refresh() {
+      var n = steps.filter(function (h) { return done[h.id]; }).length;
+      progress.querySelector('[data-check-count]').textContent = n + ' of ' + steps.length;
+      progress.querySelector('[data-check-text]').textContent = n === steps.length ? 'steps done. All finished, mabrook!' : 'steps done.';
+      progress.querySelector('[data-check-bar]').style.width = (steps.length ? (n / steps.length) * 100 : 0) + '%';
+      store(key, JSON.stringify(done));
+    }
+    steps.forEach(function (h, i) {
+      if (!h.id) h.id = 'step-' + (i + 1);
+      var label = h.textContent.replace(/^\d+\.\s*/, '');
+      var box = doc.createElement('button');
+      box.type = 'button';
+      box.className = 'check-box';
+      box.setAttribute('role', 'checkbox');
+      box.setAttribute('aria-label', 'Done: ' + label);
+      box.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+      function paint() {
+        box.setAttribute('aria-checked', String(!!done[h.id]));
+        h.classList.toggle('is-done', !!done[h.id]);
+        var body = h.nextElementSibling;
+        if (body && body.classList.contains('sec-body')) body.classList.toggle('is-done', !!done[h.id]);
+      }
+      box.addEventListener('click', function () {
+        if (done[h.id]) delete done[h.id]; else done[h.id] = 1;
+        paint();
+        refresh();
+      });
+      h.classList.add('check-step');
+      h.insertBefore(box, h.firstChild);
+      paint();
+    });
+    progress.querySelector('[data-check-reset]').addEventListener('click', function () {
+      done = {};
+      steps.forEach(function (h) {
+        h.classList.remove('is-done');
+        h.querySelector('.check-box').setAttribute('aria-checked', 'false');
+        var body = h.nextElementSibling;
+        if (body) body.classList.remove('is-done');
+      });
+      refresh();
+    });
+    progress.hidden = false;
+    refresh();
+  }
+
+  // ---------- offline reading + home screen app (live site only) ----------
+
+  if (!PREVIEW && 'serviceWorker' in navigator && location.protocol === 'https:') {
+    window.addEventListener('load', function () { navigator.serviceWorker.register(ROOT + 'sw.js').catch(function () {}); });
+  }
+
   // ---------- giant wordmarks: fit the four letters to the full width ----------
 
   function fitWordmarks() {

@@ -604,7 +604,7 @@ p { margin: 0; }
 .cal-item {
   display: grid;
   grid-template-columns: 4.5rem minmax(0, 1fr);
-  grid-template-areas: "when what" "when count";
+  grid-template-areas: "when what" "when count" "when add";
   gap: 0.4rem 1rem;
   padding-block: 1.25rem;
   border-bottom: 1px solid var(--line);
@@ -624,7 +624,7 @@ p { margin: 0; }
 .cal-count { grid-area: count; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 .kind { display: inline-block; padding: 0.2em 0.65em; border-radius: 999px; border: 1px solid var(--line); font-size: 0.78rem; font-weight: 600; color: var(--fg-muted); }
 @media (min-width: 760px) {
-  .cal-item { grid-template-columns: 6rem minmax(0, 1fr) auto; grid-template-areas: "when what count"; align-items: start; padding-block: 1.5rem; }
+  .cal-item { grid-template-columns: 6rem minmax(0, 1fr) auto; grid-template-areas: "when what count" "when add count"; align-items: start; padding-block: 1.5rem; }
   .cal-count { flex-direction: column; align-items: flex-end; text-align: right; font-size: var(--step-1); }
 }
 .cal-past { margin-top: 2rem; }
@@ -1079,7 +1079,9 @@ html.theme-switching::view-transition-new(root) { animation: theme-reveal 0.6s v
 .sec-head::before { display: none; }
 .sec-head h2 { color: inherit; font-size: var(--step-1); }
 .sec-count { background: var(--head-sub); color: inherit; }
-.sec > .sec-note, .sec > .fold-list, .sec > .wrap + .cal, .sec > .wrap + .food { margin-left: clamp(0.75rem, 0.5rem + 1vw, 1.5rem); }
+.sec > .sec-note, .sec > .fold-list { margin-left: clamp(0.75rem, 0.5rem + 1vw, 1.5rem); }
+/* full-width tools under a heading bar: offset inside the padding so nothing spills sideways */
+.sec > .wrap + .cal, .sec > .wrap + .food, .sec > .wrap + .glance { padding-left: calc(var(--gutter) + clamp(0.75rem, 0.5rem + 1vw, 1.5rem)); }
 .sec > .sec-note { margin-top: 0.6rem; }
 .sec .fold-list { border-top: 0; border-left: 2px solid var(--line); padding-left: clamp(0.5rem, 0.3rem + 1vw, 1rem); }
 .sec .fold:last-child { border-bottom: 0; }
@@ -1139,3 +1141,60 @@ html.theme-switching::view-transition-new(root) { animation: theme-reveal 0.6s v
 .showcase-pair .shots a { border-radius: 22px; border: 6px solid var(--fg); }
 .showcase figcaption { font-size: var(--step--1); color: var(--fg-muted); max-width: 52ch; line-height: 1.55; }
 .showcase figcaption b { color: var(--fg); }
+
+/* ---------- calendar: add to my calendar ---------- */
+
+.cal-add { grid-area: add; justify-self: start; display: inline-flex; align-items: center; gap: 0.4em; min-height: 44px; font-size: var(--step--1); font-weight: 700; color: var(--fg); text-decoration: underline; text-decoration-color: var(--gold); text-decoration-thickness: 2px; text-underline-offset: 0.2em; }
+.cal-add svg, .cal-all svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.cal-all { margin-top: 1.5rem; }
+
+/* ---------- calendar: at a glance ---------- */
+
+.glance .gl-range { margin-bottom: 0.6rem; }
+.gl-key { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; margin-bottom: 1rem; font-size: var(--step--1); color: var(--fg-muted); }
+.gl-key { column-gap: 1rem; }
+.gl-key > span { display: inline-flex; align-items: center; gap: 0.4rem; }
+.gl-dot { flex: none; width: 0.6rem; height: 0.6rem; border-radius: 999px; background: var(--accent); }
+.gl-dot.is-islamic, .gl-row.is-islamic .gl-title::before { background: var(--gold); }
+.gl-months, .gl-list { list-style: none; margin: 0; padding: 0; }
+.gl-month + .gl-month { margin-top: 1.1rem; }
+.gl-month h3 { font-size: var(--step--1); font-weight: 800; letter-spacing: 0.02em; color: var(--fg-muted); padding-bottom: 0.35rem; border-bottom: 1.5px solid var(--fg); }
+.gl-row a { display: grid; grid-template-columns: 6.6rem minmax(0, 1fr) auto; align-items: baseline; gap: 0.75rem; min-height: 44px; padding-block: 0.55rem; border-bottom: 1px solid var(--line); text-decoration: none; }
+.gl-when { font-weight: 700; font-size: var(--step--1); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.gl-title { position: relative; padding-left: 1rem; line-height: 1.3; }
+.gl-title::before { content: ""; position: absolute; left: 0; top: 0.45em; width: 0.5rem; height: 0.5rem; border-radius: 999px; background: var(--accent); }
+.gl-count { font-size: var(--step--1); font-weight: 700; color: var(--fg-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.gl-row.is-now .gl-count { color: var(--gold-ink); }
+.gl-row a:hover .gl-title { text-decoration: underline; text-decoration-color: var(--gold); text-decoration-thickness: 2px; text-underline-offset: 0.18em; }
+.gl-empty { color: var(--fg-muted); padding-block: 0.75rem; }
+@media (max-width: 480px) {
+  .gl-row a { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "when count" "title title"; gap: 0.15rem 0.75rem; }
+  .gl-when { grid-area: when; }
+  .gl-count { grid-area: count; }
+  .gl-title { grid-area: title; }
+}
+
+/* ---------- share a guide ---------- */
+
+.post-share { margin-top: 0.4rem; }
+
+/* ---------- What's new ---------- */
+
+.wn-note { margin: -0.4rem 0 1rem; font-weight: 600; color: var(--fg-muted); }
+.new-tag { display: inline-block; margin-left: 0.5em; padding: 0.1em 0.55em; border-radius: 999px; background: var(--gold); color: var(--on-gold); font-size: 0.72rem; font-weight: 800; vertical-align: 0.2em; text-decoration: none; }
+
+/* ---------- checklist guides ---------- */
+
+.check-progress { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 0.5rem 1rem; padding: 0.9rem 1rem; border-radius: var(--radius-small); background: var(--bg-raised); }
+.check-progress p { margin: 0; }
+.check-bar { grid-column: 1 / -1; grid-row: 2; height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.check-bar span { display: block; height: 100%; width: 0; background: var(--gold); border-radius: inherit; transition: width 0.3s var(--ease); }
+.check-reset { border: 0; padding: 0.4rem 0; min-height: 44px; background: none; font-size: var(--step--1); font-weight: 700; color: var(--fg-muted); text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer; }
+.post-body > h2.check-step { display: flex; align-items: center; gap: 0.7rem; }
+.check-box { flex: none; display: grid; place-items: center; width: 32px; height: 32px; margin: -0.2rem 0; padding: 0; border: 2px solid currentColor; border-radius: 8px; background: transparent; color: inherit; cursor: pointer; position: relative; }
+.check-box::after { content: ""; position: absolute; inset: -6px; }
+.check-box svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transform: scale(0.6); transition: opacity 0.15s, transform 0.2s var(--ease); }
+.check-box[aria-checked="true"] { background: var(--head-fg); border-color: var(--head-fg); color: var(--head-bg); }
+.check-box[aria-checked="true"] svg { opacity: 1; transform: none; }
+.post-body > h2.is-done { opacity: 0.75; }
+.post-body > .sec-body.is-done { opacity: 0.55; }

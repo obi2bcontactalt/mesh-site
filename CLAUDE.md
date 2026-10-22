@@ -66,9 +66,11 @@ kind: university
 ---
 Optional note, only if the university calendar has one.
 ```
-- **The calendar shows the university's academic calendar only.** No Islamic or national dates that aren't on it. Titles are faithful translations of the university's own wording, with the Arabic original in `arabic`.
+- **The calendar shows the university's academic calendar plus the main Islamic dates** (owner's request, October 2026). No national or other dates that aren't on the university calendar. University titles are faithful translations of the university's own wording, with the Arabic original in `arabic`.
+- **Islamic dates** (start of Ramadan, last ten days, Eid al-Fitr, first ten days of Dhul Hijjah, Arafah, Eid al-Adha, Islamic New Year, Ashura) come from the Umm al-Qura calendar: `node tools/islamic-dates.mjs 1449` writes `content/calendar/islamic-1449-*.md` with `kind: islamic` and `expected: true`. Keep only the ones inside the current academic calendar's range. When a moon sighting moves a date, correct that file's `date` (keep the file name).
 - **Passed dates are removed.** The build skips them and the page hides any that pass between builds; delete their files when you're next in the calendar folder. When a new academic calendar is published, replace the files with the new one.
 - Hijri labels are generated automatically (Umm al-Qura) and match the university's calendar.
+- The calendar page opens with **At a glance** (one line per date, grouped by month, 2 months / 6 months / whole year) and then **All dates** (the full list). Every date has an **Add to calendar** link to its own `.ics` file; `calendar/mesh-calendar.ics` has every date. The build writes these.
 
 **Restaurant** `content/restaurants/al-tazaj-quba.md`
 ```
@@ -86,6 +88,8 @@ maps: https://maps.app.goo.gl/...   (optional; otherwise built from lat/lng)
 One or two lines: what to order, when to go.
 ```
 Coordinates must come from the owner or a shared maps link. Never guess a location.
+
+- `checklist: true` turns a guide's `##` steps into tick boxes with a progress bar. Ticks are saved on the reader's phone (used on the new-student steps).
 
 **Markdown extras**
 - ` ```prompt Label ` … ` ``` ` makes a prompt card with a Copy button.
@@ -116,7 +120,8 @@ The look comes from the MESH logo. Keep it.
 - **One bold thing per page:** the giant MESH on the home page, the topic name on topic pages. Everything around it stays quiet.
 - **Motion** is limited to what exists (owner approved all of it): the home entrance, the wordmark drifting on scroll, the footer letters rising, topic rows sweeping on hover, page transitions, the theme reveal, plus small ambient touches: a gold light drifting along the lattice in the hero and green bands, a glint on the gold rule, the rotating search hint, a light passing over the next-date card with a breathing countdown, arrows nudging in on the topic list, rippling map pins and turning landmark diamonds. Don't add fade-ins to sections. Everything switches off with reduced motion.
 - No emoji in the interface. Icons come only from the set in `tools/templates.mjs`.
-- Button words stay the same everywhere: "Ask MESH", "Share a tip", "Copy prompt", "Directions", "Send to MESH".
+- Button words stay the same everywhere: "Ask MESH", "Share a tip", "Copy prompt", "Directions", "Send to MESH", "Share on WhatsApp", "Add to calendar".
+- **Features (owner approved, October 2026):** every guide has a "Share on WhatsApp" button under its date; the home page's "What's new" marks guides updated since the reader's last visit; the live site is installable (manifest + `tools/sw.js`, copied to `dist/sw.js` with every page precached for offline reading; the About page explains Add to Home Screen). The service worker skips `assets/files/tawsif/` (too big). These run only in the live build, not the preview.
 - Must work at 360px wide with no sideways scrolling, with a keyboard, and in both themes.
 
 ## Before pushing

@@ -20,6 +20,9 @@ const icon = {
   theme: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16Z" class="fill"/></svg>',
   arrow: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>',
   back: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>',
+  calendarAdd: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M8.5 3v4M15.5 3v4M12 13v5M9.5 15.5h5"/></svg>',
+  share: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a8 8 0 0 1-11.7 7.1L4 20l1.4-4.1A8 8 0 1 1 20 11.5Z"/><path d="M9 10.5h6M9 13.5h4"/></svg>',
+  check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
   pin: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.3"/></svg>',
 };
 
@@ -61,7 +64,11 @@ function head(ctx, { title, description, depth, ogPath = '' }) {
 <meta name="mesh-root" content="${root}">
 <meta name="theme-color" content="#0F5A3B">${og}
 <link rel="icon" href="${root}assets/img/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="${root}assets/img/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="${root}assets/img/apple-touch-icon.png">${PREVIEW ? '' : `
+<link rel="manifest" href="${root}manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="MESH">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">`}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="${FONTS}">
@@ -106,6 +113,7 @@ function footer(ctx, depth) {
         <li><a href="${link(depth, 'ask/')}?type=tip">Share a tip</a></li>
         <li><a href="${link(depth, 'ask/')}?type=fix">Report a mistake</a></li>
         <li><a href="${link(depth, 'about/')}">About MESH</a></li>
+        <li><a href="${link(depth, 'about/')}#app">Add to home screen</a></li>
       </ul></nav>
     </div>
   </div>
@@ -168,7 +176,7 @@ export function promptCard(label, text) {
 
 function postList(ctx, depth, list, { showTopic = false } = {}) {
   const { link, topicBySlug } = ctx;
-  return `<ul class="post-list">${list.map((p) => `<li>
+  return `<ul class="post-list">${list.map((p) => `<li data-updated="${p.updated}">
     <a class="post-row" href="${link(depth, `${p.topic}/${p.slug}/`)}">
       <span class="pr-title">${esc(p.title)}${badge(p)}</span>
       <span class="pr-summary">${esc(p.summary)}</span>
@@ -263,9 +271,10 @@ export function homePage(ctx) {
       </a>
     </li>`).join('');
 
-  const recent = posts.slice(0, 4);
-  const recentSection = recent.length ? `<section class="wrap recent" aria-labelledby="recent-h">
-  <h2 id="recent-h" class="section-title">Recently updated</h2>
+  const recent = posts.slice(0, 6);
+  const recentSection = recent.length ? `<section class="wrap recent" aria-labelledby="recent-h" data-whats-new>
+  <h2 id="recent-h" class="section-title">What’s new</h2>
+  <p class="wn-note" data-wn-note hidden></p>
   ${postList(ctx, depth, recent, { showTopic: true })}
 </section>` : '';
 
@@ -324,7 +333,10 @@ export function topicPage(ctx, t) {
 
   // Sections in order of importance: the topic's own tool (dates, map), then prompts, then guides.
   const sections = [];
-  if (t.widget === 'calendar') sections.push({ id: 'dates', label: 'Dates', count: events.length, html: calendarWidget(ctx, depth) });
+  if (t.widget === 'calendar') {
+    sections.push({ id: 'glance', label: 'At a glance', count: '', html: calendarGlance(ctx, depth) });
+    sections.push({ id: 'dates', label: 'All dates', count: events.length, html: calendarWidget(ctx, depth) });
+  }
   if (t.widget === 'restaurants') sections.push({ id: 'map', label: 'Map', count: restaurants.length, html: restaurantWidget(ctx, depth) });
   if (prompts.length) sections.push({ id: 'prompts', label: 'AI prompts', count: prompts.length, note: 'Tap a prompt to open it and copy it. <b>How to use it</b> has the steps.', html: foldList(ctx, depth, prompts) });
   if (guideList.length) sections.push({ id: 'guides', label: t.slug === 'study' ? 'Resources' : 'Guides', count: guideList.length, html: foldList(ctx, depth, guideList) });
@@ -332,7 +344,7 @@ export function topicPage(ctx, t) {
   const many = sections.length > 1;
   const jump = many ? `<nav class="jump" aria-label="On this page">${sections.map((x) => `<a class="chip" href="#${x.id}">${esc(x.label)}<span class="chip-n">${x.count || ''}</span></a>`).join('')}</nav>` : '';
   const sectionHtml = sections.map((x) => {
-    const isWidget = x.id === 'dates' || x.id === 'map';
+    const isWidget = x.id === 'dates' || x.id === 'map' || x.id === 'glance';
     if (isWidget && !many) return x.html; // a page that's only a tool needs no heading
     if (isWidget) return `<section class="sec" id="${x.id}" aria-labelledby="${x.id}-h"><div class="wrap">${sectionHead(x.id, x.label, x.count)}</div>${x.html}</section>`;
     return `<section class="sec wrap" id="${x.id}" aria-labelledby="${x.id}-h">${sectionHead(x.id, x.label, x.count, x.note)}${x.html}</section>`;
@@ -366,6 +378,7 @@ function calendarWidget(ctx, depth) {
   const { events } = ctx;
   if (!events.length) return `<section class="wrap"><div class="empty"><p class="empty-title">No dates yet.</p><p>Dates from the university calendar will appear here with countdowns.</p></div></section>`;
   const group = (e) => e.term || e.kindLabel;
+  const { link } = ctx;
   const groups = [...new Set(events.map(group))];
   const chips = groups.length > 1 ? `<div class="chips" role="group" aria-label="Show">
       <button type="button" class="chip" aria-pressed="true" data-filter="all">All</button>
@@ -381,10 +394,45 @@ function calendarWidget(ctx, depth) {
         ${e.noteHtml ? `<div class="cal-body prose">${e.noteHtml}</div>` : ''}
       </div>
       <p class="cal-count"><span class="kind">${esc(group(e))}</span><span data-countdown></span></p>
+      <a class="cal-add" href="${link(depth, `calendar/${e.slug}.ics`)}">${icon.calendarAdd}Add to calendar</a>
     </li>`;
   return `<section class="wrap cal" data-calendar aria-label="Dates">
   ${chips}
   <ol class="cal-list">${events.map(item).join('')}</ol>
+  <p class="cal-all"><a class="btn btn-ghost btn-small" href="${link(depth, 'calendar/mesh-calendar.ics')}">${icon.calendarAdd}Add every date to my calendar</a></p>
+</section>`;
+}
+
+// A compact view: one line per date, grouped by month, for a quick check of what's coming.
+function calendarGlance(ctx, depth) {
+  const { events } = ctx;
+  if (!events.length) return '';
+  const monthOf = (e) => (e.open ? e.end : e.date).slice(0, 7);
+  const months = [...new Set(events.map(monthOf))];
+  const monthName = (m) => new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(m + '-01T00:00:00Z'));
+  const short = (iso) => new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', timeZone: 'UTC' }).format(new Date(iso + 'T00:00:00Z'));
+  const dayNum = (iso) => String(Number(iso.slice(8)));
+  const when = (e) => {
+    if (e.open) return `Until ${short(e.end)}`;
+    if (!e.end) return short(e.date);
+    return e.date.slice(0, 7) === e.end.slice(0, 7) ? `${short(e.date)}–${dayNum(e.end)}` : `${short(e.date)} – ${new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(e.end + 'T00:00:00Z'))}`;
+  };
+  const row = (e) => `<li class="gl-row${e.kind === 'islamic' ? ' is-islamic' : ''}" data-date="${e.date}" data-end="${e.end}">
+        <a href="#${e.slug}"><span class="gl-when">${esc(when(e))}</span><span class="gl-title">${esc(e.title)}</span><span class="gl-count" data-countdown></span></a>
+      </li>`;
+  return `<section class="wrap glance" data-glance aria-label="Dates at a glance">
+  <div class="chips gl-range" role="group" aria-label="Show dates in the next">
+    <button type="button" class="chip" aria-pressed="true" data-range="60">2 months</button>
+    <button type="button" class="chip" aria-pressed="false" data-range="183">6 months</button>
+    <button type="button" class="chip" aria-pressed="false" data-range="all">Whole year</button>
+  </div>
+  <p class="gl-key"><span><span class="gl-dot"></span>University</span><span><span class="gl-dot is-islamic"></span>Islamic (expected, the moon sighting confirms)</span></p>
+  <ol class="gl-months">${months.map((m) => `
+    <li class="gl-month" data-month="${m}"><h3>${esc(monthName(m))}</h3>
+      <ol class="gl-list">${events.filter((e) => monthOf(e) === m).map(row).join('')}</ol>
+    </li>`).join('')}
+  </ol>
+  <p class="gl-empty" hidden>Nothing in this period. Try a longer range.</p>
 </section>`;
 }
 
@@ -454,6 +502,13 @@ function km(a, b) {
 
 // ---------- post ----------
 
+// Share a guide on WhatsApp: opens WhatsApp with the title and the link ready to send.
+function shareButton(ctx, t, p) {
+  const base = (ctx.site.url || '').replace(/\/$/, '');
+  const text = `${p.title} (MESH)\n${base}/${t.slug}/${p.slug}/`;
+  return `<p class="post-share"><a class="btn btn-small btn-ghost" href="https://wa.me/?text=${encodeURIComponent(text)}" target="_blank" rel="noopener">${icon.share}Share on WhatsApp</a></p>`;
+}
+
 export function postPage(ctx, t, p) {
   const { link, site } = ctx;
   const depth = 2;
@@ -464,8 +519,9 @@ export function postPage(ctx, t, p) {
     <h1 class="post-title">${esc(p.title)}${badge(p)}</h1>
     <p class="post-summary">${esc(p.summary)}</p>
     <p class="post-meta">Updated <time datetime="${p.updated}">${esc(fmtDate(p.updated))}</time>${p.source ? `. ${esc(p.source)}` : ''}</p>
+    ${shareButton(ctx, t, p)}
   </header>
-  <div class="prose post-body">${p.html}</div>
+  <div class="prose post-body"${p.checklist ? ` data-checklist="${t.slug}/${p.slug}"` : ''}>${p.checklist ? `<div class="check-progress" data-check-progress hidden><p><b data-check-count></b> <span data-check-text></span></p><div class="check-bar" aria-hidden="true"><span data-check-bar></span></div><button type="button" class="check-reset" data-check-reset>Start again</button></div>` : ''}${p.html}</div>
   <p class="post-fix">Something out of date? <a href="${link(depth, 'ask/')}?type=fix&topic=${t.slug}&page=${encodeURIComponent(t.slug + '/' + p.slug + '/')}">Tell us and we’ll fix it</a>.</p>
 </article>
 ${more.length ? `<section class="wrap more" aria-labelledby="more-h"><h2 id="more-h" class="section-title">More in ${esc(lowerFirst(t.title))}</h2>${postList(ctx, depth, more)}</section>` : ''}
@@ -539,6 +595,12 @@ export function aboutPage(ctx) {
     <p>It started as a Telegram group. Most people here don't use Telegram, so everything moved to this site, sorted by topic so you can find it without scrolling through old messages.</p>
     <h2>Who runs it</h2>
     <p>A small team of students, in their spare time. Nothing here is official. Rules and dates change, so always confirm anything important with the university or the right government office, and check when a guide was last updated.</p>
+    <h2 id="app">Put MESH on your home screen</h2>
+    <p>MESH works like an app: it opens from your home screen, and once you've visited, every guide opens even without signal (files like PDFs need signal the first time).</p>
+    <ul>
+      <li><b>iPhone and iPad:</b> open MESH in Safari, tap the Share button, then <b>Add to Home Screen</b>.</li>
+      <li><b>Android:</b> open MESH in Chrome, tap the menu (three dots), then <b>Install app</b> or <b>Add to Home screen</b>.</li>
+    </ul>
     <h2>How to help</h2>
     <p>If you know something useful, a good place to eat, or spot a mistake, <a href="${link(depth, 'ask/')}?type=tip">send it in</a>. Every message is read.</p>
     <p class="dua ar" lang="ar" dir="rtl">جزاكم الله خيرا</p>
